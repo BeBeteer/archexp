@@ -166,7 +166,7 @@ module archexp(
 		.console_we(console_we),
 		.console_addr(console_addr[6:0])
 	);
-	console_dev_io U0(
+	console U0(
 		.clock(clk_100mhz_inv),
 		.text_addr(console_addr[11:0]),
 		.text_write(console_we),

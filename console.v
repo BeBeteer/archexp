@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 
-module console_dev_io(
+module console(
 		input clock,
 		input [11:0] text_addr,
 		input text_write,
