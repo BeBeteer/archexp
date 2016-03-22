@@ -74,5 +74,4 @@ module vga_controller(
 
 	assign x_position = h_counter - H_BPORCH;
 	assign y_position = v_counter - V_BPORCH;
-
 endmodule
