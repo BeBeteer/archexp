@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 
-module bin_to_hex_ascii (
+module hex_ascii (
 	input [3:0] in,
 	output [7:0] out
 	);

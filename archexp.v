@@ -31,6 +31,7 @@ module archexp(
 	wire [31:0] inst_out;
 	wire mem_w;
 	wire [31:0] PC_out;
+	wire state;
 	wire [31:0] Addr_out;
 	wire [31:0] Data_out;
 
