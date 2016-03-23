@@ -30,7 +30,7 @@ module debugger (
 			: console_next_addr == 15 ? cpu_pc[3:0]
 			: 4'hF;
 	wire [7:0] hex_out;
-	bin_to_hex_ascii U_bin_to_hex_ascii (
+	bin_to_hex_ascii u_bin_to_hex_ascii (
 		.in(hex_in),
 		.out(hex_out)
 	);
