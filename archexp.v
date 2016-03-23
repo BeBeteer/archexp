@@ -28,10 +28,10 @@ module archexp(
 	wire clk_IO;
 
 	// U1 Multi_CPU
-	wire [31:0] inst_out;
+	wire [31:0] cpu_inst;
 	wire mem_w;
-	wire [31:0] PC_out;
-	wire state;
+	wire [31:0] cpu_pc;
+	wire [4:0] cpu_state;
 	wire [31:0] Addr_out;
 	wire [31:0] Data_out;
 
@@ -59,12 +59,12 @@ module archexp(
 	wire [9:0] ram_addr;
 	wire data_ram_we;
 
-	wire [11:0] console_addr;
-	wire console_write;
-	wire [7:0] console_in;
-	wire [7:0] console_out;
+	wire [11:0] terminal_addr;
+	wire terminal_write;
+	wire [7:0] terminal_in;
+	wire [7:0] terminal_out;
 
-	// U0 console_dev_io
+	// U0 terminal
 	wire [9:0] x_position;
 	wire [8:0] y_position;
 	wire inside_video;
@@ -100,13 +100,13 @@ module archexp(
 	Multi_CPU U1 (
 		.clk(clk_CPU),
 		.reset(rst),
-		.inst_out(inst_out[31:0]),
+		.inst_out(cpu_inst[31:0]),
 		.INT(counter0_OUT),
 		.Data_in(CPU_data4bus[31:0]),
 		.MIO_ready(~button_out[1]),
 		.mem_w(mem_w),
-		.PC_out(PC_out[31:0]),
-		.state(),
+		.PC_out(cpu_pc[31:0]),
+		.state(cpu_state[4:0]),
 		.Addr_out(Addr_out[31:0]),
 		.Data_out(Data_out[31:0]),
 		.CPU_MIO()
@@ -164,26 +164,31 @@ module archexp(
 		.ram_addr(ram_addr[9:0]),
 		.data_ram_we(data_ram_we)
 		
-//		.console_out(console_out[31:0]),
-//		.console_we(console_write),
-//		.console_addr(console_addr[11:0])
+//		.terminal_out(terminal_out[31:0]),
+//		.terminal_we(terminal_write),
+//		.terminal_addr(terminal_addr[11:0])
 	);
-	debugger U_debugger (
+	debugger u_debugger (
 		.clock(clk_100mhz),
-		.cpu_pc(PC_out[31:0]),
-		.console_addr(console_addr[11:0]),
-		.console_write(console_write),
-		.console_data(console_in[7:0])
+		.cpu_pc(cpu_pc[31:0]),
+		.cpu_inst(cpu_inst[31:0]),
+		.cpu_state(cpu_state[4:0]),
+		.cpu_mem_addr(Addr_out[31:0]),
+		.cpu_mem_read_data(CPU_data4bus[31:0]),
+		.cpu_mem_write_data(Data_out[31:0]),
+		.terminal_addr(terminal_addr[11:0]),
+		.terminal_write(terminal_write),
+		.terminal_data(terminal_in[7:0])
 	);
-	console U0 (
+	terminal U0 (
 		.clock(clk_100mhz_inv),
-		.text_addr(console_addr[11:0]),
-		.text_write(console_write),
-		.text_in(console_in[7:0]),
+		.text_addr(terminal_addr[11:0]),
+		.text_write(terminal_write),
+		.text_in(terminal_in[7:0]),
 		.x_position(x_position[9:0]),
 		.y_position(y_position[8:0]),
 		.inside_video(inside_video),
-		.text_out(console_out[7:0]),
+		.text_out(terminal_out[7:0]),
 		.color(color[7:0])
 	);
 	assign red = color[7:5];
@@ -207,13 +212,13 @@ module archexp(
 		.point_in({32{1'b1}}),
 		.blink_in({{24{1'b0}}, blink[3:0], blink[3:0]}),
 		.disp_cpudata(Peripheral_in[31:0]),
-		.Test_data1({2'b00, PC_out[31:2]}),
+		.Test_data1({2'b00, cpu_pc[31:2]}),
 		.Test_data2(counter_out[31:0]),
-		.Test_data3(inst_out[31:0]),
+		.Test_data3(cpu_inst[31:0]),
 		.Test_data4(Addr_out[31:0]),
 		.Test_data5(Data_out[31:0]),
 		.Test_data6(CPU_data4bus[31:0]),
-		.Test_data7(PC_out[31:0]),
+		.Test_data7(cpu_pc[31:0]),
 		.disp_num(Disp_num[31:0]),
 		.blink_out(blink_out[3:0]),
 		.point_out(point_out[3:0])

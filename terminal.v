@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 
-module console (
+module terminal (
 		input clock,
 		input [11:0] text_addr,
 		input text_write,
