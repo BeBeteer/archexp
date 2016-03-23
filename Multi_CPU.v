@@ -35,7 +35,7 @@ module Multi_CPU(
 	wire zero;
 	wire overflow;
 
-	ctrl U11(
+	ctrl U11 (
 			.clk(clk),
 			.reset(reset),
 			.zero(zero),
@@ -61,7 +61,7 @@ module Multi_CPU(
 	);
 	assign mem_w = MemWrite && (!MemRead);
 
-	M_datapath U12(
+	M_datapath U12 (
 			.clk(clk),
 			.reset(reset),
 			.MIO_ready(MIO_ready),

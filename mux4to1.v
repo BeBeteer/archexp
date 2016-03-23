@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 
-module mux4to1(
+module mux4to1 (
 		input [4 * WIDTH - 1:0] in,
 		input [1:0] select,
 		output [WIDTH - 1:0] out

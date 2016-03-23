@@ -59,7 +59,8 @@ module archexp(
 	wire data_ram_we;
 
 	wire [11:0] console_addr;
-	wire console_we;
+	wire console_write;
+	wire [7:0] console_in;
 	wire [7:0] console_out;
 
 	// U0 console_dev_io
@@ -79,7 +80,7 @@ module archexp(
 	// Unknown
 	wire [3:0] blink;
 
-	Anti_jitter U9(
+	Anti_jitter U9 (
 		.clk(clk_100mhz),
 		.button(BTN[3:0]),
 		.SW(SW[7:0]),
@@ -88,14 +89,14 @@ module archexp(
 		.button_pulse(),
 		.SW_OK(SW_OK[7:0])
 	);
-	clk_div U8(
+	clk_div U8 (
 		.clk(clk_100mhz),
 		.rst(rst),
 		.clkdiv(clkdiv[31:0])
 	);
 	assign clk_CPU = SW_OK[2] ? clkdiv[24] : clkdiv[1];
 	assign clk_IO = ~clk_CPU;
-	Multi_CPU U1(
+	Multi_CPU U1 (
 		.clk(clk_CPU),
 		.reset(rst),
 		.inst_out(inst_out[31:0]),
@@ -110,14 +111,14 @@ module archexp(
 		.CPU_MIO()
 	);
 	assign clk_100mhz_inv = ~clk_100mhz;
-	RAM_B U3(
+	RAM_B U3 (
 		.addra(ram_addr[9:0]),
 		.wea(data_ram_we),
 		.dina(ram_data_in[31:0]),
 		.clka(clk_100mhz_inv),
 		.douta(ram_data_out[31:0])
 	);
-	Counter_x U10(
+	Counter_x U10 (
 		.clk(clk_IO),
 		.rst(rst),
 		.clk0(clkdiv[7]),
@@ -131,7 +132,7 @@ module archexp(
 		.counter2_OUT(counter2_OUT),
 		.counter_out(counter_out[31:0])
 	);
-	led_Dev_IO U7(
+	led_Dev_IO U7 (
 		.clk(clk_IO),
 		.rst(rst),
 		.GPIOf0000000_we(GPIOf0000000_we),
@@ -141,7 +142,7 @@ module archexp(
 		.GPIOf0()
 	);
 	assign LED = led_out[7:0];
-	MIO_BUS U4(
+	MIO_BUS U4 (
 		.mem_w(mem_w),
 		.counter0_out(counter0_OUT),
 		.counter1_out(counter1_OUT),
@@ -160,17 +161,24 @@ module archexp(
 		.Peripheral_in(Peripheral_in[31:0]),
 		.ram_data_in(ram_data_in[31:0]),
 		.ram_addr(ram_addr[9:0]),
-		.data_ram_we(data_ram_we),
+		.data_ram_we(data_ram_we)
 		
-		.console_out(console_out[31:0]),
-		.console_we(console_we),
-		.console_addr(console_addr[6:0])
+//		.console_out(console_out[31:0]),
+//		.console_we(console_write),
+//		.console_addr(console_addr[11:0])
 	);
-	console U0(
+	debugger U_debugger (
+		.clock(clk_100mhz),
+		.cpu_pc(PC_out[31:0]),
+		.console_addr(console_addr[11:0]),
+		.console_write(console_write),
+		.console_data(console_in[7:0])
+	);
+	console U0 (
 		.clock(clk_100mhz_inv),
 		.text_addr(console_addr[11:0]),
-		.text_write(console_we),
-		.text_in(Peripheral_in[7:0]),
+		.text_write(console_write),
+		.text_in(console_in[7:0]),
 		.x_position(x_position[9:0]),
 		.y_position(y_position[8:0]),
 		.inside_video(inside_video),
@@ -181,7 +189,7 @@ module archexp(
 	assign green = color[4:2];
 	assign blue = color[1:0];
 	assign clock_25mhz = clkdiv[1];
-	vga_controller U00(
+	vga_controller U00 (
 		.clock_25mhz(clock_25mhz),
 		.reset(rst),
 		.h_sync(h_sync),
@@ -190,7 +198,7 @@ module archexp(
 		.x_position(x_position[9:0]),
 		.y_position(y_position[8:0])
 	);
-	seven_seg_Dev_IO U5(
+	seven_seg_Dev_IO U5 (
 		.clk(clk_IO),
 		.rst(rst),
 		.GPIOe0000000_we(GPIOe0000000_we),
@@ -209,7 +217,7 @@ module archexp(
 		.blink_out(blink_out[3:0]),
 		.point_out(point_out[3:0])
 	);
-	seven_seg_dev U6(
+	seven_seg_dev U6 (
 		.flash_clk(clkdiv[26]),
 		.disp_num(Disp_num[31:0]),
 		.SW(SW_OK[1:0]),
