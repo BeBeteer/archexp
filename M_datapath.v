@@ -22,7 +22,8 @@ module M_datapath(
 		output [31:0] data_out,
 		output [31:0] M_addr,
 		output zero,
-		output overflow
+		output overflow,
+		output [32 * 32 - 1 : 0] regs
 	);
 
 	// U_MDR REG32
@@ -90,7 +91,8 @@ module M_datapath(
 			.Wt_data(Wt_data[31:0]),
 			.L_S(RegWrite),
 			.rdata_A(rdata_A[31:0]),
-			.rdata_B(data_out[31:0])
+			.rdata_B(data_out[31:0]),
+			.regs(regs[32 * 32 - 1 : 0])
 	);
 	Ext_32 U_Ext (
 			.Imm_16(Inst[15:0]),

@@ -9,8 +9,9 @@ module Regs(
 		input [4:0] Wt_addr,
 		input [31:0] Wt_data,
 		output [31:0] rdata_A,
-		output [31:0] rdata_B
-		);
+		output [31:0] rdata_B,
+		output [32 * 32 - 1 : 0] regs
+	);
 
 	reg [31:0] register [1:31];
 
@@ -34,4 +35,12 @@ module Regs(
 			register[Wt_addr] <= Wt_data;
 		end
 	end
+
+	assign regs = {register[31], register[30], register[29], register[28],
+			register[27], register[26], register[25], register[24], register[23],
+			register[22], register[21], register[20], register[19], register[18],
+			register[17], register[16], register[15], register[14], register[13],
+			register[12], register[11], register[10], register[9], register[8],
+			register[7], register[6], register[5], register[4], register[3],
+			register[2], register[1], 32'b0};
 endmodule

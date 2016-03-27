@@ -34,6 +34,7 @@ module archexp(
 	wire [4:0] cpu_state;
 	wire [31:0] Addr_out;
 	wire [31:0] Data_out;
+	wire [32 * 32 - 1 : 0] cpu_regs;
 
 	// U3 RAM_B
 	wire clk_100mhz_inv;
@@ -109,7 +110,8 @@ module archexp(
 		.state(cpu_state[4:0]),
 		.Addr_out(Addr_out[31:0]),
 		.Data_out(Data_out[31:0]),
-		.CPU_MIO()
+		.CPU_MIO(),
+		.regs(cpu_regs[32 * 32 - 1 : 0])
 	);
 	assign clk_100mhz_inv = ~clk_100mhz;
 	RAM_B U3 (
@@ -176,6 +178,7 @@ module archexp(
 		.cpu_mem_addr(Addr_out[31:0]),
 		.cpu_mem_read_data(CPU_data4bus[31:0]),
 		.cpu_mem_write_data(Data_out[31:0]),
+		.cpu_regs(cpu_regs[32 * 32 - 1 : 0]),
 		.terminal_addr(terminal_addr[11:0]),
 		.terminal_write(terminal_write),
 		.terminal_data(terminal_in[7:0])

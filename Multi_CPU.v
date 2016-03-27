@@ -12,7 +12,8 @@ module Multi_CPU(
 		input [31:0] Data_in,	// 
 		output CPU_MIO,	// Be used
 		input INT,	// 
-		output [4:0] state	// Test
+		output [4:0] state,	// Test
+		output [32 * 32 - 1 : 0] regs
 	);
 
 	// U11 ctrl
@@ -83,6 +84,7 @@ module Multi_CPU(
 			.PC_Current(PC_out[31:0]),
 			.Inst(inst_out[31:0]),
 			.data_out(Data_out[31:0]),
-			.M_addr(Addr_out[31:0])
+			.M_addr(Addr_out[31:0]),
+			.regs(regs[32 * 32 - 1 : 0])
 	);
 endmodule
