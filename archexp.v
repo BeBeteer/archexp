@@ -183,7 +183,7 @@ module archexp(
 		.terminal_write(terminal_write),
 		.terminal_data(terminal_in[7:0])
 	);
-	terminal U0 (
+	terminal u_terminal (
 		.clock(clk_100mhz_inv),
 		.text_addr(terminal_addr[11:0]),
 		.text_write(terminal_write),

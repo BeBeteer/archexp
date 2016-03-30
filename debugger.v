@@ -37,6 +37,7 @@ module debugger (
 	endfunction
 
 	wire [3:0] hex_ascii_in = is_next_terminal_addr_in_range(0, 8, 8) ? cpu_pc[31 - 4 * (terminal_next_addr - calc_terminal_addr(0, 8)) -: 4]
+	
 			: is_next_terminal_addr_in_range(3, 8, 8) ? cpu_mem_addr[31 - 4 * (terminal_next_addr - calc_terminal_addr(3, 8)) -: 4]
 			: is_next_terminal_addr_in_range(4, 8, 8) ? cpu_mem_read_data[31 - 4 * (terminal_next_addr - calc_terminal_addr(4, 8)) -: 4]
 			: is_next_terminal_addr_in_range(5, 8, 8) ? cpu_mem_write_data[31 - 4 * (terminal_next_addr - calc_terminal_addr(5, 8)) -: 4]
@@ -82,8 +83,8 @@ module debugger (
 		.out(hex_ascii_out)
 	);
 
-	wire bin_ascii_in = terminal_next_addr >= is_next_terminal_addr_in_range(1, 8, 32) ? cpu_inst[terminal_next_addr - calc_terminal_addr(1, 8)]
-			: terminal_next_addr >= is_next_terminal_addr_in_range(2, 8, 4) ? cpu_state[terminal_next_addr - calc_terminal_addr(2, 8)]
+	wire bin_ascii_in = is_next_terminal_addr_in_range(1, 8, 32) ? cpu_inst[31 - (terminal_next_addr - calc_terminal_addr(1, 8))]
+			: is_next_terminal_addr_in_range(2, 8, 5) ? cpu_state[5 - (terminal_next_addr - calc_terminal_addr(2, 8))]
 			: 1'b1;
 	wire [7:0] bin_ascii_out;
 	bin_ascii u_bin_ascii (
@@ -110,7 +111,7 @@ module debugger (
 				: is_next_terminal_addr_in_range(1, 8, 32) ? bin_ascii_out
 
 				: is_next_terminal_addr_in_range(2, 0, 6) ? STATE_PROMPT[8 * (terminal_next_addr - calc_terminal_addr(2, 0)) +: 8]
-				: is_next_terminal_addr_in_range(2, 8, 4) ? bin_ascii_out
+				: is_next_terminal_addr_in_range(2, 8, 5) ? bin_ascii_out
 
 				: is_next_terminal_addr_in_range(3, 0, 6) ? MEM_ADDR_PROMPT[8 * (terminal_next_addr - calc_terminal_addr(3, 0)) +: 8]
 				: is_next_terminal_addr_in_range(3, 8, 8) ? hex_ascii_out
@@ -156,6 +157,6 @@ module debugger (
 				: is_next_terminal_addr_in_range(13, 0, 8) ? hex_ascii_out
 				: is_next_terminal_addr_in_range(13, 16, 8) ? hex_ascii_out
 
-				: 0;
+				: 8'b0;
 	end
 endmodule
