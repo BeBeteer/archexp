@@ -5,5 +5,5 @@ module bin_ascii (
 		output [7:0] out
 	);
 
-	assign out = in ? "0" : "1";
+	assign out = in ? "1" : "0";
 endmodule
