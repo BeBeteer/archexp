@@ -16,17 +16,17 @@ module terminal (
 	localparam COLOR_BLACK = 8'b000_000_00;
 
 	// 640x480, 80x30
-	reg [7:0] text [0:2399];
+	reg [15:0] text [0:2399];
 
 	always @(posedge clock) begin
 		if (text_write) begin
-			text[text_addr] <= text_in;
+			text[text_addr] <= {COLOR_WHITE, text_in};
 		end
 	end
-	assign text_out = text[text_addr];
+	assign text_out = text[text_addr][7:0];
 
 	wire [11:0] text_index = x_position / 8 + (y_position / 16) * 80;
-	wire [7:0] font_index = text[text_index];
+	wire [7:0] font_index = text[text_index][7:0];
 	wire [2:0] font_x = x_position % 8;
 	wire [3:0] font_y = y_position % 16;
 	wire [11:0] font_addr = font_index * 16 + font_y;
@@ -36,5 +36,6 @@ module terminal (
 		.spo(font_out[7:0])
 	);
 	wire point = font_out[8 - font_x];
-	assign color = inside_video ? (point ? COLOR_WHITE : COLOR_BLACK) : 8'b0;
+	wire [7:0] text_color = text[text_index][15:8];
+	assign color = inside_video ? (point ? text_color : COLOR_BLACK) : 8'b0;
 endmodule

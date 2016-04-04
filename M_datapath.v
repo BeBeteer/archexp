@@ -48,19 +48,19 @@ module M_datapath(
 	// U_PC REG32
 	wire [31:0] PC_Next;
 
-	REG32 U_IR (
-			.clk(clock),
-			.rst(1'b0),
-			.CE(IRWrite),
-			.D(Data_in[31:0]),
-			.Q(Inst[31:0])
+	Register ir (
+			.clock(clock),
+			.reset(1'b0),
+			.writeEnabled(IRWrite),
+			.readData(Inst[31:0]),
+			.writeData(Data_in[31:0])
 	);
-	REG32 U_MDR (
-			.clk(clock),
-			.rst(1'b0),
-			.CE(1'b1),
-			.D(Data_in[31:0]),
-			.Q(MDR[31:0])
+	Register mdr (
+			.clock(clock),
+			.reset(1'b0),
+			.writeEnabled(1'b1),
+			.readData(MDR[31:0]),
+			.writeData(Data_in[31:0])
 	);
 	mux4to1 #(5) U_mux_Wt_addr (
 			.in({
@@ -82,7 +82,7 @@ module M_datapath(
 			.select(MemtoReg[1:0]),
 			.out(Wt_data[31:0])
 	);
-	Registers U2 (
+	RegisterFile registerFile (
 			.clock(clock),
 			.reset(reset),
 			.writeEnabled(RegWrite),
@@ -117,12 +117,12 @@ module M_datapath(
 			.res(res[31:0]),
 			.overflow(overflow)
 	);
-	REG32 U_ALUOut (
-			.clk(clock),
-			.rst(1'b0),
-			.CE(1'b1),
-			.D(res[31:0]),
-			.Q(ALUOut[31:0])
+	Register U_ALUOut (
+			.clock(clock),
+			.reset(1'b0),
+			.writeEnabled(1'b1),
+			.readData(ALUOut[31:0]),
+			.writeData(res[31:0])
 	);
 	mux4to1 #(32) U_mux_PC_next (
 			.in({
@@ -134,12 +134,12 @@ module M_datapath(
 			.select(PCSource[1:0]),
 			.out(PC_Next[31:0])
 	);
-	REG32 U_PC (
-			.clk(clock),
-			.rst(reset),
-			.CE(MIO_ready && (PCWrite || (PCWriteCond && (Branch == zero)))),
-			.D(PC_Next[31:0]),
-			.Q(PC_Current[31:0])
+	Register pc (
+			.clock(clock),
+			.reset(reset),
+			.writeEnabled(MIO_ready && (PCWrite || (PCWriteCond && (Branch == zero)))),
+			.readData(PC_Current[31:0]),
+			.writeData(PC_Next[31:0])
 	);
 	assign M_addr = IorD ? ALUOut : PC_Current;
 endmodule

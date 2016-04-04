@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 
-module Registers (
+module RegisterFile (
 		input clock,
 		input reset,
 		input writeEnabled,

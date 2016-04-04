@@ -1,7 +1,7 @@
 `timescale 1ns / 1ps
 
 module archexp(
-		input clk_100mhz,
+		input clock50Mhz,
 		input [3:0] BTN,
 		input [7:0] SW,
 		output [3:0] AN,
@@ -22,10 +22,6 @@ module archexp(
 
 	// U8 clk_div
 	wire [31:0] clkdiv;
-	// 12.5MHz
-	wire clk_CPU;
-	// 12.5MHz, inverted
-	wire clk_IO;
 
 	// U1 Multi_CPU
 	wire [31:0] cpu_inst;
@@ -37,28 +33,11 @@ module archexp(
 	wire [32 * 32 - 1 : 0] cpu_regs;
 
 	// U3 RAM_B
-	wire clk_100mhz_inv;
+	wire clk_50mhz_inv;
 	wire [31:0] ram_data_out;
 
-	// U10 Counter_X
-	wire counter0_OUT;
-	wire counter1_OUT;
-	wire counter2_OUT;
-	wire [31:0] counter_out;
-
-	// U7 led_Dev_IO
-	wire [1:0] counter_set;
-	wire [7:0] led_out;
-
-	// U4 MIO_BUS
-	wire GPIOf0000000_we;
-	wire GPIOe0000000_we;
-	wire counter_we;
-	wire [31:0] CPU_data4bus;
-	wire [31:0] Peripheral_in;
 	wire [31:0] ram_data_in;
 	wire [9:0] ram_addr;
-	wire data_ram_we;
 
 	wire [11:0] terminal_addr;
 	wire terminal_write;
@@ -71,19 +50,8 @@ module archexp(
 	wire inside_video;
 	wire [7:0] color;
 
-	// U00 vga_controller
-	wire clock_25mhz;
-
-	// U5 seven_seg_Dev_IO
-	wire [31:0] Disp_num;
-	wire [3:0] blink_out;
-	wire [3:0] point_out;
-
-	// Unknown
-	wire [3:0] blink;
-
 	Anti_jitter U9 (
-		.clk(clk_100mhz),
+		.clk(clock50Mhz),
 		.button(BTN[3:0]),
 		.SW(SW[7:0]),
 		.button_out(button_out[3:0]),
@@ -92,99 +60,54 @@ module archexp(
 		.SW_OK(SW_OK[7:0])
 	);
 	clk_div U8 (
-		.clk(clk_100mhz),
+		.clk(clock50Mhz),
 		.rst(rst),
 		.clkdiv(clkdiv[31:0])
 	);
-	assign clk_CPU = SW_OK[2] ? clkdiv[24] : clkdiv[1];
-	assign clk_IO = ~clk_CPU;
+	wire clock12_5Mhz = clkdiv[2];
+	wire cpuClock = SW_OK[2] ? clkdiv[24] : clock12_5Mhz;
 	Multi_CPU U1 (
-		.clk(clk_CPU),
+		.clk(cpuClock),
 		.reset(rst),
 		.inst_out(cpu_inst[31:0]),
-		.INT(counter0_OUT),
-		.Data_in(CPU_data4bus[31:0]),
+		.INT(),
+		.Data_in(ram_data_out[31:0]),
 		.MIO_ready(~button_out[1]),
 		.mem_w(mem_w),
 		.PC_out(cpu_pc[31:0]),
 		.state(cpu_state[4:0]),
 		.Addr_out(Addr_out[31:0]),
-		.Data_out(Data_out[31:0]),
+		.Data_out(ram_data_in[31:0]),
 		.CPU_MIO(),
 		.regs(cpu_regs[32 * 32 - 1 : 0])
 	);
-	assign clk_100mhz_inv = ~clk_100mhz;
+	assign ram_addr = Addr_out[11:2];
+	// TODO: Do we need the inversion?
+	wire clock50MhzInverted = ~clock50Mhz;
 	RAM_B U3 (
 		.addra(ram_addr[9:0]),
-		.wea(data_ram_we),
+		.wea(mem_w),
 		.dina(ram_data_in[31:0]),
-		.clka(clk_100mhz_inv),
+		.clka(clock50Mhz),
 		.douta(ram_data_out[31:0])
 	);
-	Counter_x U10 (
-		.clk(clk_IO),
-		.rst(rst),
-		.clk0(clkdiv[7]),
-		.clk1(clkdiv[10]),
-		.clk2(clkdiv[10]),
-		.counter_we(counter_we),
-		.counter_val(Peripheral_in[31:0]),
-		.counter_ch(counter_set[1:0]),
-		.counter0_OUT(counter0_OUT),
-		.counter1_OUT(counter1_OUT),
-		.counter2_OUT(counter2_OUT),
-		.counter_out(counter_out[31:0])
-	);
-	led_Dev_IO U7 (
-		.clk(clk_IO),
-		.rst(rst),
-		.GPIOf0000000_we(GPIOf0000000_we),
-		.Peripheral_in(Peripheral_in[31:0]),
-		.counter_set(counter_set[1:0]),
-		.led_out(led_out[7:0]),
-		.GPIOf0()
-	);
-	assign LED = led_out[7:0];
-	MIO_BUS U4 (
-		.mem_w(mem_w),
-		.counter0_out(counter0_OUT),
-		.counter1_out(counter1_OUT),
-		.counter2_out(counter2_OUT),
-		.BTN(button_out[3:0]),
-		.SW(SW_OK[7:0]),
-		.addr_bus(Addr_out[31:0]),
-		.Cpu_data2bus(Data_out[31:0]),
-		.ram_data_out(ram_data_out[31:0]),
-		.led_out(led_out[7:0]),
-		.counter_out(counter_out[31:0]),
-		.GPIOf0000000_we(GPIOf0000000_we),
-		.GPIOe0000000_we(GPIOe0000000_we),
-		.counter_we(counter_we),
-		.Cpu_data4bus(CPU_data4bus[31:0]),
-		.Peripheral_in(Peripheral_in[31:0]),
-		.ram_data_in(ram_data_in[31:0]),
-		.ram_addr(ram_addr[9:0]),
-		.data_ram_we(data_ram_we)
-		
-//		.terminal_out(terminal_out[31:0]),
-//		.terminal_we(terminal_write),
-//		.terminal_addr(terminal_addr[11:0])
-	);
 	debugger u_debugger (
-		.clock(clk_100mhz),
+		.clock(clock25Mhz),
 		.cpu_pc(cpu_pc[31:0]),
 		.cpu_inst(cpu_inst[31:0]),
 		.cpu_state(cpu_state[4:0]),
+		.cpu_mem_write(mem_w),
 		.cpu_mem_addr(Addr_out[31:0]),
-		.cpu_mem_read_data(CPU_data4bus[31:0]),
-		.cpu_mem_write_data(Data_out[31:0]),
+		.cpu_mem_read_data(ram_data_out[31:0]),
+		.cpu_mem_write_data(ram_data_in[31:0]),
 		.cpu_regs(cpu_regs[32 * 32 - 1 : 0]),
 		.terminal_addr(terminal_addr[11:0]),
 		.terminal_write(terminal_write),
 		.terminal_data(terminal_in[7:0])
 	);
+	wire clock25MhzInverted = ~clock25Mhz;
 	terminal u_terminal (
-		.clock(clk_100mhz_inv),
+		.clock(clock25MhzInverted),
 		.text_addr(terminal_addr[11:0]),
 		.text_write(terminal_write),
 		.text_in(terminal_in[7:0]),
@@ -197,43 +120,14 @@ module archexp(
 	assign red = color[7:5];
 	assign green = color[4:2];
 	assign blue = color[1:0];
-	assign clock_25mhz = clkdiv[1];
+	assign clock25Mhz = clkdiv[1];
 	vga_controller U00 (
-		.clock_25mhz(clock_25mhz),
+		.clock_25mhz(clock25Mhz),
 		.reset(rst),
 		.h_sync(h_sync),
 		.v_sync(v_sync),
 		.inside_video(inside_video),
 		.x_position(x_position[9:0]),
 		.y_position(y_position[8:0])
-	);
-	seven_seg_Dev_IO U5 (
-		.clk(clk_IO),
-		.rst(rst),
-		.GPIOe0000000_we(GPIOe0000000_we),
-		.Test(SW_OK[7:5]),
-		.point_in({32{1'b1}}),
-		.blink_in({{24{1'b0}}, blink[3:0], blink[3:0]}),
-		.disp_cpudata(Peripheral_in[31:0]),
-		.Test_data1({2'b00, cpu_pc[31:2]}),
-		.Test_data2(counter_out[31:0]),
-		.Test_data3(cpu_inst[31:0]),
-		.Test_data4(Addr_out[31:0]),
-		.Test_data5(Data_out[31:0]),
-		.Test_data6(CPU_data4bus[31:0]),
-		.Test_data7(cpu_pc[31:0]),
-		.disp_num(Disp_num[31:0]),
-		.blink_out(blink_out[3:0]),
-		.point_out(point_out[3:0])
-	);
-	seven_seg_dev U6 (
-		.flash_clk(clkdiv[26]),
-		.disp_num(Disp_num[31:0]),
-		.SW(SW_OK[1:0]),
-		.Scanning(clkdiv[19:18]),
-		.SEGMENT(SEGMENT[7:0]),
-		.pointing(point_out[3:0]),
-		.blinking(blink_out[3:0]),
-		.AN(AN[3:0])
 	);
 endmodule
