@@ -1,7 +1,7 @@
 `timescale 1ns / 1ps
 
 module M_datapath(
-		input clk,
+		input clock,
 		input reset,
 		input MIO_ready,
 		input IorD,
@@ -49,14 +49,14 @@ module M_datapath(
 	wire [31:0] PC_Next;
 
 	REG32 U_IR (
-			.clk(clk),
+			.clk(clock),
 			.rst(1'b0),
 			.CE(IRWrite),
 			.D(Data_in[31:0]),
 			.Q(Inst[31:0])
 	);
 	REG32 U_MDR (
-			.clk(clk),
+			.clk(clock),
 			.rst(1'b0),
 			.CE(1'b1),
 			.D(Data_in[31:0]),
@@ -82,17 +82,17 @@ module M_datapath(
 			.select(MemtoReg[1:0]),
 			.out(Wt_data[31:0])
 	);
-	Regs U2 (
-			.clk(clk),
-			.rst(reset),
-			.R_addr_A(Inst[25:21]),
-			.R_addr_B(Inst[20:16]),
-			.Wt_addr(Wt_addr[4:0]),
-			.Wt_data(Wt_data[31:0]),
-			.L_S(RegWrite),
-			.rdata_A(rdata_A[31:0]),
-			.rdata_B(data_out[31:0]),
-			.regs(regs[32 * 32 - 1 : 0])
+	Registers U2 (
+			.clock(clock),
+			.reset(reset),
+			.writeEnabled(RegWrite),
+			.readAddressA(Inst[25:21]),
+			.readDataA(rdata_A[31:0]),
+			.readAddressB(Inst[20:16]),
+			.readDataB(data_out[31:0]),
+			.writeAddress(Wt_addr[4:0]),
+			.writeData(Wt_data[31:0]),
+			.debug_registers(regs[32 * 32 - 1 : 0])
 	);
 	Ext_32 U_Ext (
 			.Imm_16(Inst[15:0]),
@@ -118,7 +118,7 @@ module M_datapath(
 			.overflow(overflow)
 	);
 	REG32 U_ALUOut (
-			.clk(clk),
+			.clk(clock),
 			.rst(1'b0),
 			.CE(1'b1),
 			.D(res[31:0]),
@@ -135,7 +135,7 @@ module M_datapath(
 			.out(PC_Next[31:0])
 	);
 	REG32 U_PC (
-			.clk(clk),
+			.clk(clock),
 			.rst(reset),
 			.CE(MIO_ready && (PCWrite || (PCWriteCond && (Branch == zero)))),
 			.D(PC_Next[31:0]),

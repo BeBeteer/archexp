@@ -63,7 +63,7 @@ module Multi_CPU(
 	assign mem_w = MemWrite && (!MemRead);
 
 	M_datapath U12 (
-			.clk(clk),
+			.clock(clk),
 			.reset(reset),
 			.MIO_ready(MIO_ready),
 			.IorD(IorD),
