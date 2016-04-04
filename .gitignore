@@ -4,7 +4,7 @@
 !ipcore_dir
 !*.md
 !*.ngc
-orgexp.ngc
+archexp.ngc
 !*.sch
 !*.sym
 !*.ucf
