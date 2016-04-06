@@ -64,6 +64,7 @@ module archexp(
 		.rst(rst),
 		.clkdiv(clkdiv[31:0])
 	);
+	wire clock25Mhz = clkdiv[1];
 	wire clock12_5Mhz = clkdiv[2];
 	wire cpuClock = SW_OK[2] ? clkdiv[24] : clock12_5Mhz;
 	Multi_CPU U1 (
@@ -82,8 +83,6 @@ module archexp(
 		.regs(cpu_regs[32 * 32 - 1 : 0])
 	);
 	assign ram_addr = Addr_out[11:2];
-	// TODO: Do we need the inversion?
-	wire clock50MhzInverted = ~clock50Mhz;
 	RAM_B U3 (
 		.addra(ram_addr[9:0]),
 		.wea(mem_w),
@@ -105,9 +104,8 @@ module archexp(
 		.terminal_write(terminal_write),
 		.terminal_data(terminal_in[7:0])
 	);
-	wire clock25MhzInverted = ~clock25Mhz;
 	terminal u_terminal (
-		.clock(clock25MhzInverted),
+		.clock(clock50Mhz),
 		.text_addr(terminal_addr[11:0]),
 		.text_write(terminal_write),
 		.text_in(terminal_in[7:0]),
@@ -120,7 +118,6 @@ module archexp(
 	assign red = color[7:5];
 	assign green = color[4:2];
 	assign blue = color[1:0];
-	assign clock25Mhz = clkdiv[1];
 	vga_controller U00 (
 		.clock_25mhz(clock25Mhz),
 		.reset(rst),
