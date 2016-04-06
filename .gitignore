@@ -1,7 +1,7 @@
 *
 !.gitignore
-!asm
-!ipcore_dir
+!assets/
+!ipcore_dir/
 !*.md
 !*.ngc
 archexp.ngc
