@@ -2,7 +2,7 @@
 
 `include "Constants.vh"
 
-module ControlUnit(
+module ControlUnit (
 
 		input [31:0] instruction,	// instr
 		input [31:0] if_instruction,	// if_inst

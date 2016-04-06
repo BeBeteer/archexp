@@ -1,9 +1,12 @@
 `timescale 1ns / 1ps
 
 module IfStage (
+
 		input clock,
+
 		input mem_shouldBranch,	// ctrl_branch
 		input [31:0] mem_branchPc,	// mem_pc
+
 		output [31:0] pc_4,
 		output [31:0] instruction
 	);

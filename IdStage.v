@@ -1,13 +1,12 @@
 `timescale 1ns / 1ps
 
-module IdStage(
+module IdStage (
 
 		input clock,
 
-		input [31:0] pc_4,
-		input [31:0] instruction,
-		input [31:0] if_instruction,
-		input [31:0] ex_instruction,
+		input [31:0] instruction,	// id_inst
+		input [31:0] if_instruction,	// if_inst
+		input [31:0] ex_instruction,	// ex_inst
 
 		output isJump,	// is_j
 		output jumpIndex,	// j_address
