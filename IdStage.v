@@ -3,6 +3,7 @@
 module IdStage (
 
 		input clock,
+		input reset,
 
 		input [31:0] instruction,	// id_inst
 		input [31:0] if_instruction,	// if_inst

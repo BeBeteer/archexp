@@ -3,6 +3,7 @@
 module IfStage (
 
 		input clock,
+		input reset,
 
 		input mem_shouldBranch,	// ctrl_branch
 		input [31:0] mem_branchPc,	// mem_pc
@@ -15,8 +16,12 @@ module IfStage (
 
 	assign pc_4 = pc + 4;
 
-	always @(posedge clock) begin
-		pc <= mem_shouldBranch ? mem_branchPc : pc_4;
+	always @(posedge clock or posedge reset) begin
+		if (reset) begin
+			pc <= 0;
+		end else begin
+			pc <= mem_shouldBranch ? mem_branchPc : pc_4;
+		end
 	end
 
 	InstructionMemory instructionMemory (

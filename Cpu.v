@@ -1,7 +1,8 @@
 `timescale 1ns / 1ps
 
 module Cpu (
-		input clock
+		input clock,
+		input reset
 	);
 
 	wire [31:0] if_pc_4;
@@ -19,6 +20,7 @@ module Cpu (
 	IfStage ifStage (
 
 		.clock(clock),
+		.reset(reset),
 
 		.mem_shouldBranch(mem_shouldBranch),
 		.mem_branchPc(mem_branchPc),
@@ -30,6 +32,7 @@ module Cpu (
 	IfIdRegisters ifIdRegisters (
 
 		.clock(clock),
+		.reset(reset),
 
 		.if_pc_4(if_pc_4[31:0]),
 		.if_instruction(if_instruction[31:0]),
@@ -41,6 +44,7 @@ module Cpu (
 	IdStage idStage (
 
 		.clock(clock),
+		.reset(reset),
 
 		.instruction(id_instruction[31:0]),
 		.if_instruction(if_instruction[31:0]),
@@ -52,6 +56,7 @@ module Cpu (
 	IdExRegisters idExRegisters (
 
 		.clock(clock),
+		.reset(reset),
 
 		.id_pc_4(id_pc_4[31:0]),
 		.id_instruction(id_instruction[31:0]),
