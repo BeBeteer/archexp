@@ -10,9 +10,10 @@ module ControlUnit (
 
 		output isJump,	// is_j, J or JAL
 		output [25:0] jumpIndex,	// j_address
-		output isBneElseBeq,	// cu_bne_beq
-		output isBranch,	// cu_branch, BEQ or BNE
+		output isJumpAndLink,	// is_jal
 		output isJumpRegister,	// is_jr, JR, but not JALR yet
+		output isBranch,	// cu_branch, BEQ or BNE
+		output isBneElseBeq,	// cu_bne_beq
 
 		output shouldSignElseZeroExtendImmediate,	// cu_sext
 		output [4:0] aluOperation,	// cu_aluc
@@ -25,8 +26,8 @@ module ControlUnit (
 		output shouldWriteMemory,	// cu_wmem
 
 		output shouldStall,	// stall
-		output shouldForwardRegisterA,	// fwda
-		output shouldForwardRegisterB	// fwdb
+		output shouldForwardRegisterRs,	// fwda
+		output shouldForwardRegisterRt	// fwdb
 	);
 
 	wire [5:0] code = instruction[31:26];
@@ -34,11 +35,13 @@ module ControlUnit (
 
 	assign isJump = code == `CODE_J || code == `CODE_JAL;
 	assign jumpIndex = instruction[25:0];
-	assign isBneElseBeq = code == `CODE_BNE;
-	assign isBranch = code == `CODE_BEQ || isBneElseBeq;
+	// TODO: JALR
+	assign isJumpAndLink = code == `CODE_JAL;
 	wire isRType = code == `CODE_R_TYPE;
 	// TODO: JALR
 	assign isJumpRegister = isRType && function_ == FUNCTION_JR;
+	assign isBneElseBeq = code == `CODE_BNE;
+	assign isBranch = code == `CODE_BEQ || isBneElseBeq;
 
 	assign shouldSignElseZeroExtendImmediate =
 			code == `CODE_ADDI

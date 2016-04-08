@@ -1,37 +1,40 @@
 `timescale 1ns / 1ps
 
 module RegisterFile (
+
 		input clock,
 		input reset,
-		input writeEnabled,
+
 		input [4:0] readAddressA,
 		output [31:0] readDataA,
 		input [4:0] readAddressB,
-		output [31:0] readDataB,
+		output [31:0] readData,
+
+		input shouldWrite,
 		input [4:0] writeAddress,
 		input [31:0] writeData,
+
 		output [32 * 32 - 1 : 0] debug_registers
 	);
 
 	reg [31:0] registers [1:31];
-	integer i;
 	initial begin
+		integer i;
 		for (i = 1; i < 32; i = i + 1) begin
 			registers[i] = 0;
 		end
 	end
 
 	assign readDataA = readAddressA == 0 ? 32'b0 : registers[readAddressA];
-
 	assign readDataB = readAddressB == 0 ? 32'b0 : registers[readAddressB];
 
-	integer j;
-	always @(posedge clock or posedge reset) begin
+	always @(negedge clock or posedge reset) begin
 		if (reset) begin
-			for (j = 1; j < 32; j = j + 1) begin
-				registers[j] <= 0;
+			integer i;
+			for (i = 1; i < 32; i = i + 1) begin
+				registers[i] <= 0;
 			end
-		end else if (writeEnabled && writeAddress != 0) begin
+		end else if (shouldWrite && writeAddress != 0) begin
 			registers[writeAddress] <= writeData;
 		end
 	end

@@ -90,3 +90,57 @@ for port in portList:
 print("""		end
 	end
 endmodule""")
+
+print('-' * 80)
+
+for port in portList:
+    if port:
+        print('	wire', end='')
+        if port.width:
+            print(' {}'.format(port.width), end='')
+        print(' {}_{};'.format(inputStageName, port.name))
+print()
+for port in portList:
+    if port:
+        print('	wire', end='')
+        if port.width:
+            print(' {}'.format(port.width), end='')
+        print(' {}_{};'.format(outputStageName, port.name))
+
+print('-' * 80)
+
+print("""	{}{}Registers {}{}Registers (
+
+		.clock(clock),
+		.reset(reset),
+""".format(inputStageName.capitalize(), outputStageName.capitalize(), inputStageName, outputStageName.capitalize()))
+precedingIsPort = False
+for port in portList:
+    if precedingIsPort:
+        print(',')
+    if port:
+        print('		.{}_{}({}_{}'.format(inputStageName, port.name, inputStageName, port.name), end='')
+        if port.width:
+            print(port.width, end='')
+        print(')', end='')
+        precedingIsPort = True
+    else:
+        print()
+        precedingIsPort = False
+print(""",
+""")
+precedingIsPort = False
+for port in portList:
+    if precedingIsPort:
+        print(',')
+    if port:
+        print('		.{}_{}({}_{}'.format(outputStageName, port.name, outputStageName, port.name), end='')
+        if port.width:
+            print(port.width, end='')
+        print(')', end='')
+        precedingIsPort = True
+    else:
+        print()
+        precedingIsPort = False
+print("""
+	);""")
