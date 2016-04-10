@@ -17,11 +17,10 @@ module archexp(
 
 	// U9 Anti_jitter
 	wire [3:0] button_out;
-	wire rst;
+	wire reset;
 	wire [7:0] SW_OK;
 
-	// U8 clk_div
-	wire [31:0] clkdiv;
+	wire [31:0] clockCounter;
 
 	// U1 Multi_CPU
 	wire [31:0] cpu_inst;
@@ -32,10 +31,7 @@ module archexp(
 	wire [31:0] Data_out;
 	wire [32 * 32 - 1 : 0] cpu_regs;
 
-	// U3 RAM_B
-	wire clk_50mhz_inv;
 	wire [31:0] ram_data_out;
-
 	wire [31:0] ram_data_in;
 	wire [9:0] ram_addr;
 
@@ -55,40 +51,21 @@ module archexp(
 		.button(BTN[3:0]),
 		.SW(SW[7:0]),
 		.button_out(button_out[3:0]),
-		.rst(rst),
+		.rst(reset),
 		.button_pulse(),
 		.SW_OK(SW_OK[7:0])
 	);
-	clk_div U8 (
-		.clk(clock50Mhz),
-		.rst(rst),
-		.clkdiv(clkdiv[31:0])
+	ClockDivider clockDivider (
+		.clock(clock50Mhz),
+		.reset(reset),
+		.counter(clockCounter[31:0])
 	);
-	wire clock25Mhz = clkdiv[1];
-	wire clock12_5Mhz = clkdiv[2];
-	wire cpuClock = SW_OK[2] ? clkdiv[24] : clock12_5Mhz;
-	Multi_CPU U1 (
-		.clk(cpuClock),
-		.reset(rst),
-		.inst_out(cpu_inst[31:0]),
-		.INT(),
-		.Data_in(ram_data_out[31:0]),
-		.MIO_ready(~button_out[1]),
-		.mem_w(mem_w),
-		.PC_out(cpu_pc[31:0]),
-		.state(cpu_state[4:0]),
-		.Addr_out(Addr_out[31:0]),
-		.Data_out(ram_data_in[31:0]),
-		.CPU_MIO(),
-		.regs(cpu_regs[32 * 32 - 1 : 0])
-	);
-	assign ram_addr = Addr_out[11:2];
-	RAM_B U3 (
-		.addra(ram_addr[9:0]),
-		.wea(mem_w),
-		.dina(ram_data_in[31:0]),
-		.clka(clock50Mhz),
-		.douta(ram_data_out[31:0])
+	wire clock25Mhz = clockCounter[1];
+	wire clock12_5Mhz = clockCounter[2];
+	wire cpuClock = SW_OK[2] ? clockCounter[24] : clock12_5Mhz;
+	Cpu cpu (
+		.clock(cpuClock),
+		.reset(reset)
 	);
 	debugger u_debugger (
 		.clock(clock25Mhz),
@@ -120,7 +97,7 @@ module archexp(
 	assign blue = color[1:0];
 	vga_controller U00 (
 		.clock_25mhz(clock25Mhz),
-		.reset(rst),
+		.reset(reset),
 		.h_sync(h_sync),
 		.v_sync(v_sync),
 		.inside_video(inside_video),

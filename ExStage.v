@@ -25,14 +25,14 @@ module ExStage(
 
 		output [31:0] aluOutput,	// ex_aluR
 
-		output [31:0] isAluOutputZero,	// ex_zero
+		output isAluOutputZero,	// ex_zero
 		output [31:0] branchPc	// ex_pc
 	);
 
 	wire rt = instruction[20:16];
 	wire rd = instruction[15:11];
 	assign registerWriteAddress =
-			isJumpAndLink ? 31
+			isJumpAndLink ? 5'd31
 			: shouldWriteToRegisterRtElseRd ? rt : rd;
 
 	// TODO: Forward
@@ -46,8 +46,8 @@ module ExStage(
 	Alu alu (
 		.inputA(aluInputA[31:0]),
 		.inputB(aluInputB[31:0]),
-		.opreration(aluOperation[4:0]),
-		.output_(aluOutput[31:0]),
+		.operation(aluOperation[4:0]),
+		.output_(aluOutput[31:0])
 	);
 
 	assign isAluOutputZero = aluOutput == 0;

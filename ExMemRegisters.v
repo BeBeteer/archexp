@@ -15,7 +15,7 @@ module ExMemRegisters (
 
 		input ex_isBranch,
 		input ex_isBneElseBeq,
-		input [31:0] ex_isAluOutputZero,
+		input ex_isAluOutputZero,
 		input [31:0] ex_branchPc,
 
 		input [31:0] ex_aluOutput,
@@ -38,7 +38,7 @@ module ExMemRegisters (
 
 		output reg mem_isBranch = 0,
 		output reg mem_isBneElseBeq = 0,
-		output reg [31:0] mem_isAluOutputZero = 0,
+		output reg mem_isAluOutputZero = 0,
 		output reg [31:0] mem_branchPc = 0,
 
 		output reg [31:0] mem_aluOutput = 0,

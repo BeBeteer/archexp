@@ -16,8 +16,8 @@ module IdStage (
 		output isBneElseBeq,	// cu_bne_beq
 
 		output [4:0] aluOperation,	// id_aluc
-		output shouldAluUseShiftAmountElseRegisterA,	// cu_shift
-		output shouldAluUseImmeidateElseRegisterB,	// cu_aluimm
+		output shouldAluUseShiftAmountElseRegisterRs,	// cu_shift
+		output shouldAluUseImmeidateElseRegisterRt,	// cu_aluimm
 
 		output shouldWriteRegister,	// cu_wreg
 		output shouldWriteMemoryElseAluOutputToRegister,	// cu_m2reg
@@ -57,8 +57,8 @@ module IdStage (
 
 		.shouldSignElseZeroExtendImmediate(shouldSignElseZeroExtendImmediate),
 		.aluOperation(aluOperation[4:0]),
-		.shouldAluUseShiftAmountElseRegisterA(shouldAluUseShiftAmountElseRegisterA),
-		.shouldAluUseImmeidateElseRegisterB(shouldAluUseImmeidateElseRegisterB),
+		.shouldAluUseShiftAmountElseRegisterRs(shouldAluUseShiftAmountElseRegisterRs),
+		.shouldAluUseImmeidateElseRegisterRt(shouldAluUseImmeidateElseRegisterRt),
 
 		.shouldWriteRegister(shouldWriteRegister),
 		.shouldWriteMemoryElseAluOutputToRegister(shouldWriteMemoryElseAluOutputToRegister),

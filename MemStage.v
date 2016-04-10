@@ -20,8 +20,8 @@ module MemStage(
 
 	DataMemory dataMemory(
 		.clka(~clock),
-		.addra(aluOutput[31:0]),
-		.dout(memoryData[31:0]),
+		.addra(aluOutput[7:0]),
+		.douta(memoryData[31:0]),
 		.wea(shouldWriteMemory),
 		.dina(registerRt[31:0])
 	);

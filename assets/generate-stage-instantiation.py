@@ -46,7 +46,7 @@ for port in portList:
         print(',')
     if port:
         print('		.{}('.format(port.name), end='')
-        if "_" not in port.name:
+        if '_' not in port.name or port.name == 'pc_4':
             print('{}_'.format(stageName), end='')
         print(port.name, end='')
         if port.width:

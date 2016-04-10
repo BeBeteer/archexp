@@ -9,6 +9,8 @@ module MemWbRegisters (
 
 		input mem_isJumpAndLink,
 
+		input [31:0] mem_aluOutput,
+
 		input mem_shouldWriteRegister,
 		input [4:0] mem_registerWriteAddress,
 		input mem_shouldWriteMemoryElseAluOutputToRegister,
@@ -17,6 +19,8 @@ module MemWbRegisters (
 		output reg [31:0] wb_pc_4 = 0,
 
 		output reg wb_isJumpAndLink = 0,
+
+		output reg [31:0] wb_aluOutput = 0,
 
 		output reg wb_shouldWriteRegister = 0,
 		output reg [4:0] wb_registerWriteAddress = 0,
@@ -32,6 +36,8 @@ module MemWbRegisters (
 
 			wb_isJumpAndLink <= 0;
 
+			wb_aluOutput <= 0;
+
 			wb_shouldWriteRegister <= 0;
 			wb_registerWriteAddress <= 0;
 			wb_shouldWriteMemoryElseAluOutputToRegister <= 0;
@@ -42,6 +48,8 @@ module MemWbRegisters (
 			wb_pc_4 <= mem_pc_4;
 
 			wb_isJumpAndLink <= mem_isJumpAndLink;
+
+			wb_aluOutput <= mem_aluOutput;
 
 			wb_shouldWriteRegister <= mem_shouldWriteRegister;
 			wb_registerWriteAddress <= mem_registerWriteAddress;

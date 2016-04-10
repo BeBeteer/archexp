@@ -55,7 +55,7 @@ module Cpu (
 	wire ex_shouldForwardRegisterRt;
 
 	wire [31:0] ex_aluOutput;
-	wire [31:0] ex_isAluOutputZero;
+	wire ex_isAluOutputZero;
 	wire [31:0] ex_branchPc;
 	wire [4:0] ex_registerWriteAddress;
 
@@ -67,7 +67,7 @@ module Cpu (
 	wire mem_isJumpRegister;
 	wire mem_isBranch;
 	wire mem_isBneElseBeq;
-	wire [31:0] mem_isAluOutputZero;
+	wire mem_isAluOutputZero;
 	wire [31:0] mem_branchPc;
 	wire [31:0] mem_aluOutput;
 	wire mem_shouldWriteRegister;
@@ -81,6 +81,7 @@ module Cpu (
 
 	wire [31:0] wb_pc_4;
 	wire wb_isJumpAndLink;
+	wire [31:0] wb_aluOutput;
 	wire wb_shouldWriteRegister;
 	wire [4:0] wb_registerWriteAddress;
 	wire wb_shouldWriteMemoryElseAluOutputToRegister;
@@ -136,6 +137,7 @@ module Cpu (
 		.shouldWriteToRegisterRtElseRd(id_shouldWriteToRegisterRtElseRd),
 		.shouldWriteMemory(id_shouldWriteMemory),
 
+		.shiftAmount(id_shiftAmount[31:0]),
 		.immediate(id_immediate[31:0]),
 
 		.registerRs(id_registerRs[31:0]),
@@ -218,7 +220,7 @@ module Cpu (
 
 	ExStage exStage (
 
-		.pc_4(pc_4[31:0]),
+		.pc_4(ex_pc_4[31:0]),
 		.instruction(ex_instruction[31:0]),
 
 		.aluOperation(ex_aluOperation[4:0]),
@@ -235,13 +237,14 @@ module Cpu (
 		.registerRs(ex_registerRs[31:0]),
 		.registerRt(ex_registerRt[31:0]),
 
+		// FIXME
 		.shouldStall(ex_shouldStall),
 		.shouldForwardRegisterRs(ex_shouldForwardRegisterRs),
 		.shouldForwardRegisterRt(ex_shouldForwardRegisterRt),
 
 		.aluOutput(ex_aluOutput[31:0]),
 
-		.isAluOutputZero(ex_isAluOutputZero[31:0]),
+		.isAluOutputZero(ex_isAluOutputZero),
 		.branchPc(ex_branchPc[31:0])
 	);
 
@@ -260,7 +263,7 @@ module Cpu (
 
 		.ex_isBranch(ex_isBranch),
 		.ex_isBneElseBeq(ex_isBneElseBeq),
-		.ex_isAluOutputZero(ex_isAluOutputZero[31:0]),
+		.ex_isAluOutputZero(ex_isAluOutputZero),
 		.ex_branchPc(ex_branchPc[31:0]),
 
 		.ex_aluOutput(ex_aluOutput[31:0]),
@@ -283,7 +286,7 @@ module Cpu (
 
 		.mem_isBranch(mem_isBranch),
 		.mem_isBneElseBeq(mem_isBneElseBeq),
-		.mem_isAluOutputZero(mem_isAluOutputZero[31:0]),
+		.mem_isAluOutputZero(mem_isAluOutputZero),
 		.mem_branchPc(mem_branchPc[31:0]),
 
 		.mem_aluOutput(mem_aluOutput[31:0]),
@@ -322,6 +325,8 @@ module Cpu (
 
 		.mem_isJumpAndLink(mem_isJumpAndLink),
 
+		.mem_aluOutput(mem_aluOutput[31:0]),
+
 		.mem_shouldWriteRegister(mem_shouldWriteRegister),
 		.mem_registerWriteAddress(mem_registerWriteAddress[4:0]),
 		.mem_shouldWriteMemoryElseAluOutputToRegister(mem_shouldWriteMemoryElseAluOutputToRegister),
@@ -330,6 +335,8 @@ module Cpu (
 		.wb_pc_4(wb_pc_4[31:0]),
 
 		.wb_isJumpAndLink(wb_isJumpAndLink),
+
+		.wb_aluOutput(wb_aluOutput[31:0]),
 
 		.wb_shouldWriteRegister(wb_shouldWriteRegister),
 		.wb_registerWriteAddress(wb_registerWriteAddress[4:0]),
@@ -340,7 +347,7 @@ module Cpu (
 	WbStage wbStage (
 
 		.isJumpAndLink(wb_isJumpAndLink),
-		.pc_4(pc_4[31:0]),
+		.pc_4(wb_pc_4[31:0]),
 		.shouldWriteMemoryElseAluOutputToRegister(wb_shouldWriteMemoryElseAluOutputToRegister),
 		.memoryData(wb_memoryData[31:0]),
 		.aluOutput(wb_aluOutput[31:0]),

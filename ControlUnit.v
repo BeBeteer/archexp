@@ -18,8 +18,8 @@ module ControlUnit (
 
 		output shouldSignElseZeroExtendImmediate,	// cu_sext
 		output [4:0] aluOperation,	// cu_aluc
-		output shouldAluUseShiftAmountElseRegisterA,	// cu_shift
-		output shouldAluUseImmeidateElseRegisterB,	// cu_aluimm
+		output shouldAluUseShiftAmountElseRegisterRs,	// cu_shift
+		output shouldAluUseImmeidateElseRegisterRt,	// cu_aluimm
 
 		output shouldWriteRegister,	// cu_wreg
 		output shouldWriteMemoryElseAluOutputToRegister,	// cu_m2reg
@@ -40,7 +40,7 @@ module ControlUnit (
 	assign isJumpAndLink = code == `CODE_JAL;
 	wire isRType = code == `CODE_R_TYPE;
 	// TODO: JALR
-	assign isJumpRegister = isRType && function_ == FUNCTION_JR;
+	assign isJumpRegister = isRType && function_ == `FUNCTION_JR;
 
 	assign isBneElseBeq = code == `CODE_BNE;
 	assign isBranch = code == `CODE_BEQ || isBneElseBeq;
@@ -71,7 +71,7 @@ module ControlUnit (
 				: function_ == `FUNCTION_SLLV ? `ALU_SLL
 				: function_ == `FUNCTION_SRLV ? `ALU_SRL
 				: function_ == `FUNCTION_SRAV ? `ALU_SRA
-				: ALU_NONE
+				: `ALU_NONE
 			) : code == `CODE_ADDI ? `ALU_ADD
 			: code == `CODE_ADDIU ? `ALU_ADDU
 			: code == `CODE_ANDI ? `ALU_AND
@@ -84,14 +84,14 @@ module ControlUnit (
 			: code == `CODE_BNE ? `ALU_SUB
 			: code == `CODE_SLTI ? `ALU_SUB
 			: code == `CODE_SLTIU ? `ALU_SUBU
-			: ALU_NONE;
-	assign shouldAluUseShiftAmountElseRegisterA =
+			: `ALU_NONE;
+	assign shouldAluUseShiftAmountElseRegisterRs =
 			isRType && (
 				function_ == `FUNCTION_SLL
 				|| function_ == `FUNCTION_SRL
 				|| function_ == `FUNCTION_SRA
 			);
-	assign shouldAluUseImmeidateElseRegisterB =
+	assign shouldAluUseImmeidateElseRegisterRt =
 			code == `CODE_ADDI
 			|| code == `CODE_ADDIU
 			|| code == `CODE_ANDI
