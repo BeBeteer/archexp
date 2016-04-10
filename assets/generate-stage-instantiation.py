@@ -34,11 +34,11 @@ for port in portList:
 
 print('-' * 80)
 
-print('''       {}Stage (
+print('''       {}Stage {}Stage (
 
                 .clock(clock),
                 .reset(reset),
-'''.format(stageName.capitalize()))
+'''.format(stageName.capitalize(), stageName))
 
 precedingIsPort = False
 for port in portList:

@@ -209,7 +209,7 @@ module Cpu (
 		.ex_shouldForwardRegisterRt(ex_shouldForwardRegisterRt)
 	);
 
-	ExStage (
+	ExStage exStage (
 
 		.pc_4(pc_4[31:0]),
 		.instruction(ex_instruction[31:0]),
@@ -290,7 +290,7 @@ module Cpu (
 		.mem_registerRt(mem_registerRt[31:0])
 	);
 
-	MemStage (
+	MemStage memStage (
 
 		.clock(clock),
 		.reset(reset),
