@@ -79,6 +79,13 @@ module Cpu (
 	wire mem_shouldBranch;
 	wire [31:0] mem_memoryData;
 
+	wire [31:0] wb_pc_4;
+	wire wb_isJumpAndLink;
+	wire wb_shouldWriteRegister;
+	wire [4:0] wb_registerWriteAddress;
+	wire wb_shouldWriteMemoryElseAluOutputToRegister;
+	wire [31:0] wb_memoryData;
+
 	wire [31:0] wb_registerWriteData;
 
 	IfStage ifStage (
@@ -218,7 +225,9 @@ module Cpu (
 		.shouldAluUseShiftAmountElseRegisterRs(ex_shouldAluUseShiftAmountElseRegisterRs),
 		.shouldAluUseImmeidateElseRegisterRt(ex_shouldAluUseImmeidateElseRegisterRt),
 
+		.isJumpAndLink(ex_isJumpAndLink),
 		.shouldWriteToRegisterRtElseRd(ex_shouldWriteToRegisterRtElseRd),
+		.registerWriteAddress(ex_registerWriteAddress[4:0]),
 
 		.shiftAmount(ex_shiftAmount[31:0]),
 		.immediate(ex_immediate[31:0]),
@@ -233,9 +242,7 @@ module Cpu (
 		.aluOutput(ex_aluOutput[31:0]),
 
 		.isAluOutputZero(ex_isAluOutputZero[31:0]),
-		.branchPc(ex_branchPc[31:0]),
-
-		.registerWriteAddress(ex_registerWriteAddress[4:0])
+		.branchPc(ex_branchPc[31:0])
 	);
 
 	ExMemRegisters exMemRegisters (
@@ -304,5 +311,39 @@ module Cpu (
 		.shouldWriteMemory(mem_shouldWriteMemory),
 		.registerRt(mem_registerRt[31:0]),
 		.memoryData(mem_memoryData[31:0])
+	);
+
+	MemWbRegisters memWbRegisters (
+
+		.clock(clock),
+		.reset(reset),
+
+		.mem_pc_4(mem_pc_4[31:0]),
+
+		.mem_isJumpAndLink(mem_isJumpAndLink),
+
+		.mem_shouldWriteRegister(mem_shouldWriteRegister),
+		.mem_registerWriteAddress(mem_registerWriteAddress[4:0]),
+		.mem_shouldWriteMemoryElseAluOutputToRegister(mem_shouldWriteMemoryElseAluOutputToRegister),
+		.mem_memoryData(mem_memoryData[31:0]),
+
+		.wb_pc_4(wb_pc_4[31:0]),
+
+		.wb_isJumpAndLink(wb_isJumpAndLink),
+
+		.wb_shouldWriteRegister(wb_shouldWriteRegister),
+		.wb_registerWriteAddress(wb_registerWriteAddress[4:0]),
+		.wb_shouldWriteMemoryElseAluOutputToRegister(wb_shouldWriteMemoryElseAluOutputToRegister),
+		.wb_memoryData(wb_memoryData[31:0])
+	);
+
+	WbStage wbStage (
+
+		.isJumpAndLink(wb_isJumpAndLink),
+		.pc_4(pc_4[31:0]),
+		.shouldWriteMemoryElseAluOutputToRegister(wb_shouldWriteMemoryElseAluOutputToRegister),
+		.memoryData(wb_memoryData[31:0]),
+		.aluOutput(wb_aluOutput[31:0]),
+		.registerWriteData(wb_registerWriteData[31:0])
 	);
 endmodule

@@ -113,7 +113,10 @@ module ControlUnit (
 			|| code == `CODE_LW
 			|| code == `CODE_SLTI
 			|| code == `CODE_SLTIU;
-	assign shouldWriteRegister = (isRType && !isJumpRegister) || shouldWriteToRegisterRtElseRd;
+	assign shouldWriteRegister =
+			(isRType && !isJumpRegister)
+			|| shouldWriteToRegisterRtElseRd
+			|| isJumpAndLink;
 	assign shouldWriteMemoryElseAluOutputToRegister = code == `CODE_LW;
 	assign shouldWriteMemory = code == `CODE_SW;
 

@@ -34,10 +34,10 @@ for port in portList:
 
 print('-' * 80)
 
-print('''       {}Stage {}Stage (
+print('''	{}Stage {}Stage (
 
-                .clock(clock),
-                .reset(reset),
+		.clock(clock),
+		.reset(reset),
 '''.format(stageName.capitalize(), stageName))
 
 precedingIsPort = False
@@ -45,16 +45,16 @@ for port in portList:
     if precedingIsPort:
         print(',')
     if port:
-        print('                 .{}('.format(port.name), end='')
+        print('		.{}('.format(port.name), end='')
         if "_" not in port.name:
             print('{}_'.format(stageName), end='')
-            print(port.name, end='')
+        print(port.name, end='')
         if port.width:
             print(port.width, end='')
-            print(')', end='')
-            precedingIsPort = True
+        print(')', end='')
+        precedingIsPort = True
     else:
         print()
         precedingIsPort = False
-        print('''
+print('''
 	);''')

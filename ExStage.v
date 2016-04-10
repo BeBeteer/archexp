@@ -9,7 +9,9 @@ module ExStage(
 		input shouldAluUseShiftAmountElseRegisterRs,	// eshift
 		input shouldAluUseImmeidateElseRegisterRt,	// ealuimm
 
+		input isJumpAndLink,	// ex_is_jal
 		input shouldWriteToRegisterRtElseRd,	// e_regrt
+		output [4:0] registerWriteAddress,	// ex_destR
 
 		input [31:0] shiftAmount,
 		input [31:0] immediate,	// odata_imm
@@ -24,10 +26,14 @@ module ExStage(
 		output [31:0] aluOutput,	// ex_aluR
 
 		output [31:0] isAluOutputZero,	// ex_zero
-		output [31:0] branchPc,	// ex_pc
-
-		output [4:0] registerWriteAddress	// ex_destR
+		output [31:0] branchPc	// ex_pc
 	);
+
+	wire rt = instruction[20:16];
+	wire rd = instruction[15:11];
+	assign registerWriteAddress =
+			isJumpAndLink ? 31
+			: shouldWriteToRegisterRtElseRd ? rt : rd;
 
 	// TODO: Forward
 	// TODO: Should we output forwarded registerRs/Rt?
@@ -46,8 +52,4 @@ module ExStage(
 
 	assign isAluOutputZero = aluOutput == 0;
 	assign branchPc = pc_4 + {immediate[29:0], 2'b0};
-
-	wire rt = instruction[20:16];
-	wire rd = instruction[15:11];
-	assign registerWriteAddress = shouldWriteToRegisterRtElseRd ? rt : rd;
 endmodule
