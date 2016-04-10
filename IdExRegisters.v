@@ -12,18 +12,20 @@ module IdExRegisters (
 		input [25:0] id_jumpIndex,
 		input id_isJumpAndLink,
 		input id_isJumpRegister,
+
 		input id_isBranch,
 		input id_isBneElseBeq,
 
 		input [4:0] id_aluOperation,
-		input id_shouldAluUseShiftAmountElseRegisterA,
-		input id_shouldAluUseImmeidateElseRegisterB,
+		input id_shouldAluUseShiftAmountElseRegisterRs,
+		input id_shouldAluUseImmeidateElseRegisterRt,
 
 		input id_shouldWriteRegister,
 		input id_shouldWriteMemoryElseAluOutputToRegister,
 		input id_shouldWriteToRegisterRtElseRd,
 		input id_shouldWriteMemory,
 
+		input [31:0] id_shiftAmount,
 		input [31:0] id_immediate,
 
 		input [31:0] id_registerRs,
@@ -39,18 +41,20 @@ module IdExRegisters (
 		output reg [25:0] ex_jumpIndex = 0,
 		output reg ex_isJumpAndLink = 0,
 		output reg ex_isJumpRegister = 0,
+
 		output reg ex_isBranch = 0,
 		output reg ex_isBneElseBeq = 0,
 
 		output reg [4:0] ex_aluOperation = 0,
-		output reg ex_shouldAluUseShiftAmountElseRegisterA = 0,
-		output reg ex_shouldAluUseImmeidateElseRegisterB = 0,
+		output reg ex_shouldAluUseShiftAmountElseRegisterRs = 0,
+		output reg ex_shouldAluUseImmeidateElseRegisterRt = 0,
 
 		output reg ex_shouldWriteRegister = 0,
 		output reg ex_shouldWriteMemoryElseAluOutputToRegister = 0,
 		output reg ex_shouldWriteToRegisterRtElseRd = 0,
 		output reg ex_shouldWriteMemory = 0,
 
+		output reg [31:0] ex_shiftAmount = 0,
 		output reg [31:0] ex_immediate = 0,
 
 		output reg [31:0] ex_registerRs = 0,
@@ -71,18 +75,20 @@ module IdExRegisters (
 			ex_jumpIndex <= 0;
 			ex_isJumpAndLink <= 0;
 			ex_isJumpRegister <= 0;
+
 			ex_isBranch <= 0;
 			ex_isBneElseBeq <= 0;
 
 			ex_aluOperation <= 0;
-			ex_shouldAluUseShiftAmountElseRegisterA <= 0;
-			ex_shouldAluUseImmeidateElseRegisterB <= 0;
+			ex_shouldAluUseShiftAmountElseRegisterRs <= 0;
+			ex_shouldAluUseImmeidateElseRegisterRt <= 0;
 
 			ex_shouldWriteRegister <= 0;
 			ex_shouldWriteMemoryElseAluOutputToRegister <= 0;
 			ex_shouldWriteToRegisterRtElseRd <= 0;
 			ex_shouldWriteMemory <= 0;
 
+			ex_shiftAmount <= 0;
 			ex_immediate <= 0;
 
 			ex_registerRs <= 0;
@@ -100,18 +106,20 @@ module IdExRegisters (
 			ex_jumpIndex <= id_jumpIndex;
 			ex_isJumpAndLink <= id_isJumpAndLink;
 			ex_isJumpRegister <= id_isJumpRegister;
+
 			ex_isBranch <= id_isBranch;
 			ex_isBneElseBeq <= id_isBneElseBeq;
 
 			ex_aluOperation <= id_aluOperation;
-			ex_shouldAluUseShiftAmountElseRegisterA <= id_shouldAluUseShiftAmountElseRegisterA;
-			ex_shouldAluUseImmeidateElseRegisterB <= id_shouldAluUseImmeidateElseRegisterB;
+			ex_shouldAluUseShiftAmountElseRegisterRs <= id_shouldAluUseShiftAmountElseRegisterRs;
+			ex_shouldAluUseImmeidateElseRegisterRt <= id_shouldAluUseImmeidateElseRegisterRt;
 
 			ex_shouldWriteRegister <= id_shouldWriteRegister;
 			ex_shouldWriteMemoryElseAluOutputToRegister <= id_shouldWriteMemoryElseAluOutputToRegister;
 			ex_shouldWriteToRegisterRtElseRd <= id_shouldWriteToRegisterRtElseRd;
 			ex_shouldWriteMemory <= id_shouldWriteMemory;
 
+			ex_shiftAmount <= id_shiftAmount;
 			ex_immediate <= id_immediate;
 
 			ex_registerRs <= id_registerRs;

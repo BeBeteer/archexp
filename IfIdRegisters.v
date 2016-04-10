@@ -13,10 +13,14 @@ module IfIdRegisters (
 	);
 
 	always @(posedge clock or posedge reset) begin
+
 		if (reset) begin
+
 			id_pc_4 <= 0;
 			id_instruction <= 0;
+
 		end else begin
+
 			id_pc_4 <= if_pc_4;
 			id_instruction <= if_instruction;
 		end

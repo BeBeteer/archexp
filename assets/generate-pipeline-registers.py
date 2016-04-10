@@ -27,11 +27,11 @@ portList = [key for key, group in groupby(portList)]
 
 print('-' * 80)
 
-print("""module {}{}Registers (
+print('''module {}{}Registers (
 
 		input clock,
 		input reset,
-""".format(inputStageName.capitalize(), outputStageName.capitalize()))
+'''.format(inputStageName.capitalize(), outputStageName.capitalize()))
 
 precedingIsPort = False
 for port in portList:
@@ -46,8 +46,8 @@ for port in portList:
     else:
         print()
         precedingIsPort = False
-print(""",
-""")
+print(''',
+''')
 
 precedingIsPort = False
 for port in portList:
@@ -63,13 +63,13 @@ for port in portList:
         print()
         precedingIsPort = False
 
-print("""
+print('''
 	);
 
 	always @(posedge clock or posedge reset) begin
 
 		if (reset) begin
-""")
+''')
 
 for port in portList:
     if port:
@@ -77,9 +77,9 @@ for port in portList:
     else:
         print()
 
-print("""
+print('''
 		end else begin
-""")
+''')
 
 for port in portList:
     if port:
@@ -87,9 +87,9 @@ for port in portList:
     else:
         print()
 
-print("""		end
+print('''		end
 	end
-endmodule""")
+endmodule''')
 
 print('-' * 80)
 
@@ -109,11 +109,11 @@ for port in portList:
 
 print('-' * 80)
 
-print("""	{}{}Registers {}{}Registers (
+print('''	{}{}Registers {}{}Registers (
 
 		.clock(clock),
 		.reset(reset),
-""".format(inputStageName.capitalize(), outputStageName.capitalize(), inputStageName, outputStageName.capitalize()))
+'''.format(inputStageName.capitalize(), outputStageName.capitalize(), inputStageName, outputStageName.capitalize()))
 precedingIsPort = False
 for port in portList:
     if precedingIsPort:
@@ -127,8 +127,8 @@ for port in portList:
     else:
         print()
         precedingIsPort = False
-print(""",
-""")
+print(''',
+''')
 precedingIsPort = False
 for port in portList:
     if precedingIsPort:
@@ -142,5 +142,5 @@ for port in portList:
     else:
         print()
         precedingIsPort = False
-print("""
-	);""")
+print('''
+	);''')

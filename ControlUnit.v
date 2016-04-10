@@ -12,6 +12,7 @@ module ControlUnit (
 		output [25:0] jumpIndex,	// j_address
 		output isJumpAndLink,	// is_jal
 		output isJumpRegister,	// is_jr, JR, but not JALR yet
+
 		output isBranch,	// cu_branch, BEQ or BNE
 		output isBneElseBeq,	// cu_bne_beq
 
@@ -40,6 +41,7 @@ module ControlUnit (
 	wire isRType = code == `CODE_R_TYPE;
 	// TODO: JALR
 	assign isJumpRegister = isRType && function_ == FUNCTION_JR;
+
 	assign isBneElseBeq = code == `CODE_BNE;
 	assign isBranch = code == `CODE_BEQ || isBneElseBeq;
 

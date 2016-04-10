@@ -11,10 +11,11 @@ module IdStage (
 		output [25:0] jumpIndex,	// j_address
 		output isJumpAndLink,	// is_jal
 		output isJumpRegister,	// is_jr
+
 		output isBranch,	// isBranch
 		output isBneElseBeq,	// cu_bne_beq
 
-		output [4:0] aluOperation,	// cu_aluc
+		output [4:0] aluOperation,	// id_aluc
 		output shouldAluUseShiftAmountElseRegisterA,	// cu_shift
 		output shouldAluUseImmeidateElseRegisterB,	// cu_aluimm
 
@@ -23,14 +24,15 @@ module IdStage (
 		output shouldWriteToRegisterRtElseRd,	// cu_regrt
 		output shouldWriteMemory,	// cu_wmem
 
+		output [31:0] shiftAmount,
 		output [31:0] immediate,	// id_imm
 
 		output [31:0] registerRs,	// id_inA
 		output [31:0] registerRt,	// id_inB
 
-		input mem_shouldWriteRegister,
-		input [4:0] mem_registerWriteAddress,
-		input [31:0] mem_registerWriteData,
+		input wb_shouldWriteRegister,
+		input [4:0] wb_registerWriteAddress,
+		input [31:0] wb_registerWriteData,
 
 		input [31:0] if_instruction,	// if_inst
 		input [31:0] ex_instruction,	// ex_inst
@@ -49,6 +51,7 @@ module IdStage (
 		.jumpIndex(jumpIndex[25:0]),
 		.isJumpAndLink(isJumpAndLink),
 		.isJumpRegister(isJumpRegister),
+
 		.isBranch(isBranch),
 		.isBneElseBeq(isBneElseBeq),
 
@@ -74,6 +77,7 @@ module IdStage (
 			shouldSignElseZeroExtendImmediate ? {16{instructionImmediate[15]}} : 16'b0,
 			instructionImmediate
 	};
+	assign shiftAmount = {27'b0, instruction[10:6]};
 
 	wire [4:0] rs = instruction[25:21];
 	wire [4:0] rt = instruction[20:16];
@@ -87,8 +91,8 @@ module IdStage (
 		.readAddressB(rt[4:0]),
 		.readDataB(registerRt[31:0]),
 
-		.shouldWrite(mem_shouldWriteRegister),
-		.writeAddress(mem_registerWriteAddress[4:0]),
-		.writeData(mem_registerWriteData[31:0])
+		.shouldWrite(wb_shouldWriteRegister),
+		.writeAddress(wb_registerWriteAddress[4:0]),
+		.writeData(wb_registerWriteData[31:0])
 	);
 endmodule
