@@ -13,8 +13,7 @@ module MemStage (
 
 	DataMemory dataMemory(
 		.clka(~clock),
-		// FIXME: Should be [9:2], but this will stall pc for unknown reason.
-		.addra(aluOutput[7:0]),
+		.addra(aluOutput[9:2]),
 		.douta(memoryData[31:0]),
 		.wea(shouldWriteMemory),
 		.dina(registerRtOrZero[31:0])

@@ -41,7 +41,7 @@ module ControlUnit (
 	// TODO: JALR
 	assign isJumpRegister = isRType && function_ == `FUNCTION_JR;
 	wire isBeq = code == `CODE_BEQ;
-	wire isBranch = code == isBeq || `CODE_BNE;
+	wire isBranch = isBeq || code == `CODE_BNE;
 	wire shouldBranch = isBranch && (isBeq == isRegisterRsRtEqual);
 	assign shouldJumpOrBranch = isJumpIndex || isJumpRegister || shouldBranch;
 
