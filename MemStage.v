@@ -13,7 +13,7 @@ module MemStage (
 
 	DataMemory dataMemory(
 		.clka(~clock),
-		.addra(aluOutput[7:0]),
+		.addra(aluOutput[9:2]),
 		.douta(memoryData[31:0]),
 		.wea(shouldWriteMemory),
 		.dina(registerRtOrZero[31:0])
