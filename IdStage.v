@@ -116,8 +116,8 @@ module IdStage (
 	assign registerRtOrZero = isJumpAndLink ? 32'b0 : registerRt;
 
 	assign isRegisterRsRtEqual = registerRs == registerRt;
-	wire jumpIndexPc = {pc_4[31:28], jumpIndex, 2'b0};
-	wire branchPc = pc_4 + {immediate[29:0], 2'b0};
+	wire [31:0] jumpIndexPc = {pc_4[31:28], jumpIndex, 2'b0};
+	wire [31:0] branchPc = pc_4 + {immediate[29:0], 2'b0};
 	assign jumpOrBranchPc =
 			isJumpRegister ? registerRs
 			: isJumpIndex ? jumpIndexPc
