@@ -3,30 +3,26 @@
 module IfStage (
 
 		input clock,
-		input reset,
 
-		input mem_shouldBranch,	// ctrl_branch
-		input [31:0] mem_branchPc,	// mem_pc
+		input [31:0] pc,
+
+		input id_shouldJumpOrBranch,	// BRANCH
+		input [31:0] id_jumpOrBranchPc,
 
 		output [31:0] pc_4,
-		output [31:0] instruction
+
+		output [31:0] instruction,
+
+		output [31:0] nextPc
 	);
 
-	reg [31:0] pc = 0;
-
 	assign pc_4 = pc + 4;
-
-	always @(posedge clock or posedge reset) begin
-		if (reset) begin
-			pc <= 0;
-		end else begin
-			pc <= mem_shouldBranch ? mem_branchPc : pc_4;
-		end
-	end
 
 	InstructionMemory instructionMemory (
 		.clka(~clock),
 		.addra(pc[9:2]),
 		.douta(instruction[31:0])
 	);
+
+	assign nextPc = id_shouldJumpOrBranch ? id_jumpOrBranchPc : pc_4;
 endmodule

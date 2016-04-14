@@ -1,55 +1,26 @@
 `timescale 1ns / 1ps
 
-module ExStage(
-
-		input [31:0] pc_4,	// ex_pc4
-		input [31:0] instruction,	// ex_inst
-
-		input [4:0] aluOperation,	// ealuc
-		input shouldAluUseShiftAmountElseRegisterRs,	// eshift
-		input shouldAluUseImmeidateElseRegisterRt,	// ealuimm
-
-		input isJumpAndLink,	// ex_is_jal
-		input shouldWriteToRegisterRtElseRd,	// e_regrt
-		output [4:0] registerWriteAddress,	// ex_destR
+module ExStage (
 
 		input [31:0] shiftAmount,
-		input [31:0] immediate,	// odata_imm
+		input [31:0] immediate,
 
-		input [31:0] registerRs,	// edata_a
-		input [31:0] registerRt,	// edata_b
+		input [3:0] aluOperation,	// EALUC
+		input shouldAluUseShiftAmountElseRegisterRsOrPc_4,	// ESHIFT
+		input shouldAluUseImmeidateElseRegisterRtOrZero,	// EALUIMM
 
-		input shouldStall,	// stall
-		input shouldForwardRegisterRs,	// fwda
-		input shouldForwardRegisterRt,	// fwdb
+		input [31:0] registerRsOrPc_4,
+		input [31:0] registerRtOrZero,
 
-		output [31:0] aluOutput,	// ex_aluR
-
-		output isAluOutputZero,	// ex_zero
-		output [31:0] branchPc	// ex_pc
+		output [31:0] aluOutput
 	);
 
-	wire rt = instruction[20:16];
-	wire rd = instruction[15:11];
-	assign registerWriteAddress =
-			isJumpAndLink ? 5'd31
-			: shouldWriteToRegisterRtElseRd ? rt : rd;
-
-	// TODO: Forward
-	// TODO: Should we output forwarded registerRs/Rt?
-	wire [31:0] forwardedRegisterRs = registerRs;
-	wire [31:0] forwardedRegisterRt = registerRt;
-
-	wire [31:0] aluInputA = shouldAluUseShiftAmountElseRegisterRs ? shiftAmount : forwardedRegisterRs;
-	wire [31:0] aluInputB = shouldAluUseImmeidateElseRegisterRt ? immediate : forwardedRegisterRt;
-
+	wire [31:0] aluInputA = shouldAluUseShiftAmountElseRegisterRsOrPc_4 ? shiftAmount : registerRsOrPc_4;
+	wire [31:0] aluInputB = shouldAluUseImmeidateElseRegisterRtOrZero ? immediate : registerRtOrZero;
 	Alu alu (
 		.inputA(aluInputA[31:0]),
 		.inputB(aluInputB[31:0]),
-		.operation(aluOperation[4:0]),
+		.operation(aluOperation[3:0]),
 		.output_(aluOutput[31:0])
 	);
-
-	assign isAluOutputZero = aluOutput == 0;
-	assign branchPc = pc_4 + {immediate[29:0], 2'b0};
 endmodule

@@ -5,94 +5,117 @@ module IdStage (
 		input clock,
 		input reset,
 
-		input [31:0] instruction,	// id_inst
+		input [31:0] pc_4,
 
-		output isJump,	// is_j
-		output [25:0] jumpIndex,	// j_address
-		output isJumpAndLink,	// is_jal
-		output isJumpRegister,	// is_jr
+		input [31:0] instruction,
 
-		output isBranch,	// isBranch
-		output isBneElseBeq,	// cu_bne_beq
-
-		output [4:0] aluOperation,	// id_aluc
-		output shouldAluUseShiftAmountElseRegisterRs,	// cu_shift
-		output shouldAluUseImmeidateElseRegisterRt,	// cu_aluimm
-
-		output shouldWriteRegister,	// cu_wreg
-		output shouldWriteMemoryElseAluOutputToRegister,	// cu_m2reg
-		output shouldWriteToRegisterRtElseRd,	// cu_regrt
-		output shouldWriteMemory,	// cu_wmem
+		output shouldJumpOrBranch,	// BRANCH
+		output [31:0] jumpOrBranchPc,
 
 		output [31:0] shiftAmount,
-		output [31:0] immediate,	// id_imm
+		output [31:0] immediate,
 
-		output [31:0] registerRs,	// id_inA
-		output [31:0] registerRt,	// id_inB
+		output [31:0] registerRsOrPc_4,
+		output [31:0] registerRtOrZero,
+
+		output [3:0] aluOperation,	// ALUC
+		output shouldAluUseShiftAmountElseRegisterRsOrPc_4,	// SHIFT
+		output shouldAluUseImmeidateElseRegisterRtOrZero,	// ALUIMM
+
+		output shouldWriteRegister,	// WREG
+		output [4:0] registerWriteAddress,
+		output shouldWriteMemoryElseAluOutputToRegister,	// M2REG
+
+		output shouldWriteMemory,	// WMEM
 
 		input wb_shouldWriteRegister,
 		input [4:0] wb_registerWriteAddress,
 		input [31:0] wb_registerWriteData,
 
-		input [31:0] if_instruction,	// if_inst
-		input [31:0] ex_instruction,	// ex_inst
-		output shouldStall,	// stall
-		output shouldForwardRegisterRs,	// fwda
-		output shouldForwardRegisterRt	// fwdb
+		output shouldStall	// WPCIR
 	);
 
-	wire shouldSignElseZeroExtendImmediate;	// cu_sext
-
+	wire isJumpIndex;	// JUMP
+	wire [25:0] jumpIndex;	// address
+	wire isJumpRegister;	// JR
+	wire isRegisterRsRtEqual;	// RSRTEQU
+	wire isJumpAndLink;	// JAL
+	wire shouldSignElseZeroExtendImmediate;	// SEXT
+	wire shouldWriteToRegisterRtElseRd;	// REGRT
+	wire [1:0] registerRsForwardControl;	// FWDA
+	wire [1:0] registerRtForwardControl;	// FWDB
 	ControlUnit controlUnit (
 
 		.instruction(instruction[31:0]),
 
-		.isJump(isJump),
+		.isJumpIndex(isJumpIndex),
 		.jumpIndex(jumpIndex[25:0]),
-		.isJumpAndLink(isJumpAndLink),
 		.isJumpRegister(isJumpRegister),
-
-		.isBranch(isBranch),
-		.isBneElseBeq(isBneElseBeq),
+		.isRegisterRsRtEqual(isRegisterRsRtEqual),
+		.shouldJumpOrBranch(shouldJumpOrBranch),
+		.isJumpAndLink(isJumpAndLink),
 
 		.shouldSignElseZeroExtendImmediate(shouldSignElseZeroExtendImmediate),
-		.aluOperation(aluOperation[4:0]),
-		.shouldAluUseShiftAmountElseRegisterRs(shouldAluUseShiftAmountElseRegisterRs),
-		.shouldAluUseImmeidateElseRegisterRt(shouldAluUseImmeidateElseRegisterRt),
+
+		.aluOperation(aluOperation[3:0]),
+		.shouldAluUseShiftAmountElseRegisterRsOrPc_4(shouldAluUseShiftAmountElseRegisterRsOrPc_4),
+		.shouldAluUseImmeidateElseRegisterRtOrZero(shouldAluUseImmeidateElseRegisterRtOrZero),
 
 		.shouldWriteRegister(shouldWriteRegister),
-		.shouldWriteMemoryElseAluOutputToRegister(shouldWriteMemoryElseAluOutputToRegister),
 		.shouldWriteToRegisterRtElseRd(shouldWriteToRegisterRtElseRd),
+		.shouldWriteMemoryElseAluOutputToRegister(shouldWriteMemoryElseAluOutputToRegister),
+
 		.shouldWriteMemory(shouldWriteMemory),
 
-		.if_instruction(if_instruction[31:0]),
-		.ex_instruction(ex_instruction[31:0]),
 		.shouldStall(shouldStall),
-		.shouldForwardRegisterRs(shouldForwardRegisterRs),
-		.shouldForwardRegisterRt(shouldForwardRegisterRt)
+		.registerRsForwardControl(registerRsForwardControl[1:0]),
+		.registerRtForwardControl(registerRtForwardControl[1:0])
 	);
 
+	assign shiftAmount = {27'b0, instruction[10:6]};
 	wire [15:0] instructionImmediate = instruction[15:0];
 	assign immediate = {
 			shouldSignElseZeroExtendImmediate ? {16{instructionImmediate[15]}} : 16'b0,
 			instructionImmediate
 	};
-	assign shiftAmount = {27'b0, instruction[10:6]};
 
 	wire [4:0] rs = instruction[25:21];
 	wire [4:0] rt = instruction[20:16];
+	wire [4:0] rd = instruction[15:11];
+
+	assign registerWriteAddress =
+			isJumpAndLink ? 5'd31
+			: shouldWriteToRegisterRtElseRd ? rt : rd;
+
+	wire [31:0] localRegisterRs;
+	wire [31:0] localRegisterRt;
 	RegisterFile registerFile (
 
 		.clock(clock),
 		.reset(reset),
 
 		.readAddressA(rs[4:0]),
-		.readDataA(registerRs[31:0]),
+		.readDataA(localRegisterRs[31:0]),
 		.readAddressB(rt[4:0]),
-		.readDataB(registerRt[31:0]),
+		.readDataB(localRegisterRt[31:0]),
 
 		.shouldWrite(wb_shouldWriteRegister),
 		.writeAddress(wb_registerWriteAddress[4:0]),
 		.writeData(wb_registerWriteData[31:0])
 	);
+
+	// TODO: Forwarding
+	wire [31:0] registerRs = localRegisterRs;
+	wire [31:0] registerRt = localRegisterRt;
+
+	assign registerRsOrPc_4 = isJumpAndLink ? pc_4 : registerRs;
+	assign registerRtOrZero = isJumpAndLink ? 32'b0 : registerRt;
+
+	assign isRegisterRsRtEqual = registerRs == registerRt;
+	wire jumpIndexPc = {pc_4[31:28], jumpIndex, 2'b0};
+	wire branchPc = pc_4 + {immediate[29:0], 2'b0};
+	assign jumpOrBranchPc =
+			isJumpRegister ? registerRs
+			: isJumpIndex ? jumpIndexPc
+			: branchPc;
 endmodule

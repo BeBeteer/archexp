@@ -5,7 +5,7 @@
 module Alu (
 		input [31:0] inputA,
 		input [31:0] inputB,
-		input [4:0] operation,
+		input [3:0] operation,
 		output [31:0] output_
 	);
 

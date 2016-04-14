@@ -35,9 +35,6 @@ for port in portList:
 print('-' * 80)
 
 print('''	{}Stage {}Stage (
-
-		.clock(clock),
-		.reset(reset),
 '''.format(stageName.capitalize(), stageName))
 
 precedingIsPort = False
@@ -46,7 +43,7 @@ for port in portList:
         print(',')
     if port:
         print('		.{}('.format(port.name), end='')
-        if '_' not in port.name or port.name == 'pc_4':
+        if (port.name not in ('clock', 'reset')) and ('_' not in port.name or 'pc_4' in port.name.lower()):
             print('{}_'.format(stageName), end='')
         print(port.name, end='')
         if port.width:

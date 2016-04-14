@@ -1,28 +1,21 @@
 `timescale 1ns / 1ps
 
-module MemStage(
+module MemStage (
 
 		input clock,
 		input reset,
 
-		input isBranch,	// branch
-		input isBneElseBeq,	// mem_bne_beq (missing in sample)
-		input isAluOutputZero,	// zero
-		output shouldBranch,	// mem_branch
-
-		input [31:0] aluOutput,	// mem_aluR
-		input shouldWriteMemory,	// mwmem
-		input [31:0] registerRt,	// data_in
-		output [31:0] memoryData	// m_mdata
+		input [31:0] aluOutput,
+		input shouldWriteMemory,
+		input [31:0] registerRtOrZero,
+		output [31:0] memoryData
 	);
-
-	assign shouldBranch = isBranch && (isBneElseBeq != isAluOutputZero);
 
 	DataMemory dataMemory(
 		.clka(~clock),
 		.addra(aluOutput[7:0]),
 		.douta(memoryData[31:0]),
 		.wea(shouldWriteMemory),
-		.dina(registerRt[31:0])
+		.dina(registerRtOrZero[31:0])
 	);
 endmodule

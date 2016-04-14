@@ -4,46 +4,46 @@
 
 module ControlUnit (
 
-		input [31:0] instruction,	// instr
-		input [31:0] if_instruction,	// if_inst
-		input [31:0] ex_instruction,	// ex_inst
+		input [31:0] instruction,
 
-		output isJump,	// is_j, J or JAL
-		output [25:0] jumpIndex,	// j_address
-		output isJumpAndLink,	// is_jal
-		output isJumpRegister,	// is_jr, JR, but not JALR yet
+		output isJumpIndex,	// JUMP
+		output [25:0] jumpIndex,	// address
+		output isJumpRegister,	// JR, but not JALR yet
+		input isRegisterRsRtEqual,	// RSRTEQU
+		output shouldJumpOrBranch,	// BRANCH
+		output isJumpAndLink,	// JAL
 
-		output isBranch,	// cu_branch, BEQ or BNE
-		output isBneElseBeq,	// cu_bne_beq
+		output shouldSignElseZeroExtendImmediate,	// SEXT
 
-		output shouldSignElseZeroExtendImmediate,	// cu_sext
-		output [4:0] aluOperation,	// cu_aluc
-		output shouldAluUseShiftAmountElseRegisterRs,	// cu_shift
-		output shouldAluUseImmeidateElseRegisterRt,	// cu_aluimm
+		output [3:0] aluOperation,	// ALUC
+		output shouldAluUseShiftAmountElseRegisterRsOrPc_4,	// SHIFT
+		output shouldAluUseImmeidateElseRegisterRtOrZero,	// ALUIMM
 
-		output shouldWriteRegister,	// cu_wreg
-		output shouldWriteMemoryElseAluOutputToRegister,	// cu_m2reg
-		output shouldWriteToRegisterRtElseRd,	// cu_regrt
-		output shouldWriteMemory,	// cu_wmem
+		output shouldWriteRegister,	// WREG
+		output shouldWriteToRegisterRtElseRd,	// REGRT
+		output shouldWriteMemoryElseAluOutputToRegister,	// M2REG
 
-		output shouldStall,	// stall
-		output shouldForwardRegisterRs,	// fwda
-		output shouldForwardRegisterRt	// fwdb
+		output shouldWriteMemory,	// WMEM
+
+		output shouldStall,	// WPCIR
+		output [1:0] registerRsForwardControl,	// FWDA
+		output [1:0] registerRtForwardControl	// FWDB
 	);
 
 	wire [5:0] code = instruction[31:26];
 	wire [5:0] function_ = instruction[5:0];
 
-	assign isJump = code == `CODE_J || code == `CODE_JAL;
+	assign isJumpIndex = code == `CODE_J || code == `CODE_JAL;
 	assign jumpIndex = instruction[25:0];
 	// TODO: JALR
 	assign isJumpAndLink = code == `CODE_JAL;
 	wire isRType = code == `CODE_R_TYPE;
 	// TODO: JALR
 	assign isJumpRegister = isRType && function_ == `FUNCTION_JR;
-
-	assign isBneElseBeq = code == `CODE_BNE;
-	assign isBranch = code == `CODE_BEQ || isBneElseBeq;
+	wire isBeq = code == `CODE_BEQ;
+	wire isBranch = code == isBeq || `CODE_BNE;
+	wire shouldBranch = isBranch && (isBeq == isRegisterRsRtEqual);
+	assign shouldJumpOrBranch = isJumpIndex || isJumpRegister || shouldBranch;
 
 	assign shouldSignElseZeroExtendImmediate =
 			code == `CODE_ADDI
@@ -54,7 +54,8 @@ module ControlUnit (
 			|| code == `CODE_BNE
 			|| code == `CODE_SLTI;
 	assign aluOperation =
-			isRType ? (
+			isJumpAndLink ? `ALU_ADD	// pc_4 + 0
+			: isRType ? (
 				function_ == `FUNCTION_ADD ? `ALU_ADD
 				: function_ == `FUNCTION_ADDU ? `ALU_ADDU
 				: function_ == `FUNCTION_SUB ? `ALU_SUB
@@ -85,23 +86,27 @@ module ControlUnit (
 			: code == `CODE_SLTI ? `ALU_SUB
 			: code == `CODE_SLTIU ? `ALU_SUBU
 			: `ALU_NONE;
-	assign shouldAluUseShiftAmountElseRegisterRs =
-			isRType && (
+	assign shouldAluUseShiftAmountElseRegisterRsOrPc_4 =
+			!isJumpAndLink	// pc_4
+			&& (isRType && (
 				function_ == `FUNCTION_SLL
 				|| function_ == `FUNCTION_SRL
 				|| function_ == `FUNCTION_SRA
+			));
+	assign shouldAluUseImmeidateElseRegisterRtOrZero =
+			!isJumpAndLink	// 0
+			&& (
+				code == `CODE_ADDI
+				|| code == `CODE_ADDIU
+				|| code == `CODE_ANDI
+				|| code == `CODE_ORI
+				|| code == `CODE_XORI
+				|| code == `CODE_LUI	// TODO: Correct?
+				|| code == `CODE_LW
+				|| code == `CODE_SW
+				|| code == `CODE_SLTI
+				|| code == `CODE_SLTIU
 			);
-	assign shouldAluUseImmeidateElseRegisterRt =
-			code == `CODE_ADDI
-			|| code == `CODE_ADDIU
-			|| code == `CODE_ANDI
-			|| code == `CODE_ORI
-			|| code == `CODE_XORI
-			|| code == `CODE_LUI	// TODO: Correct?
-			|| code == `CODE_LW
-			|| code == `CODE_SW
-			|| code == `CODE_SLTI
-			|| code == `CODE_SLTIU;
 
 	assign shouldWriteToRegisterRtElseRd =
 			code == `CODE_ADDI
@@ -118,6 +123,7 @@ module ControlUnit (
 			|| shouldWriteToRegisterRtElseRd
 			|| isJumpAndLink;
 	assign shouldWriteMemoryElseAluOutputToRegister = code == `CODE_LW;
+
 	assign shouldWriteMemory = code == `CODE_SW;
 
 	// TODO: Forward and stall.
