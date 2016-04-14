@@ -15,21 +15,18 @@ module archexp(
 		output v_sync
 	);
 
-	// U9 Anti_jitter
 	wire [3:0] button_out;
 	wire reset;
 	wire [7:0] SW_OK;
 
 	wire [31:0] clockCounter;
 
-	// U1 Multi_CPU
-	wire [31:0] cpu_inst;
-	wire mem_w;
 	wire [31:0] cpu_pc;
-	wire [4:0] cpu_state;
+	wire [31:0] cpu_instruction;
+	wire [32 * 32 - 1 : 0] cpu_registers;
+	wire mem_w;
 	wire [31:0] Addr_out;
 	wire [31:0] Data_out;
-	wire [32 * 32 - 1 : 0] cpu_regs;
 
 	wire [31:0] ram_data_out;
 	wire [31:0] ram_data_in;
@@ -64,19 +61,23 @@ module archexp(
 	wire clock12_5Mhz = clockCounter[2];
 	wire cpuClock = SW_OK[2] ? clockCounter[24] : clock12_5Mhz;
 	Cpu cpu (
+
 		.clock(cpuClock),
-		.reset(reset)
+		.reset(reset),
+
+		.debug_pc(cpu_pc[31:0]),
+		.debug_instruction(cpu_instruction[31:0]),
+		.debug_registers(cpu_registers[32 * 32 - 1 : 0])
 	);
 	debugger u_debugger (
 		.clock(clock25Mhz),
 		.cpu_pc(cpu_pc[31:0]),
-		.cpu_inst(cpu_inst[31:0]),
-		.cpu_state(cpu_state[4:0]),
+		.cpu_instruction(cpu_instruction[31:0]),
 		.cpu_mem_write(mem_w),
 		.cpu_mem_addr(Addr_out[31:0]),
 		.cpu_mem_read_data(ram_data_out[31:0]),
 		.cpu_mem_write_data(ram_data_in[31:0]),
-		.cpu_regs(cpu_regs[32 * 32 - 1 : 0]),
+		.cpu_registers(cpu_registers[32 * 32 - 1 : 0]),
 		.terminal_addr(terminal_addr[11:0]),
 		.terminal_write(terminal_write),
 		.terminal_data(terminal_in[7:0])

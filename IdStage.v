@@ -32,7 +32,9 @@ module IdStage (
 		input [4:0] wb_registerWriteAddress,
 		input [31:0] wb_registerWriteData,
 
-		output shouldStall	// WPCIR
+		output shouldStall,	// WPCIR
+
+		output [32 * 32 - 1 : 0] debug_registers
 	);
 
 	wire isJumpIndex;	// JUMP
@@ -101,7 +103,9 @@ module IdStage (
 
 		.shouldWrite(wb_shouldWriteRegister),
 		.writeAddress(wb_registerWriteAddress[4:0]),
-		.writeData(wb_registerWriteData[31:0])
+		.writeData(wb_registerWriteData[31:0]),
+
+		.debug_registers(debug_registers[32 * 32 - 1 : 0])
 	);
 
 	// TODO: Forwarding

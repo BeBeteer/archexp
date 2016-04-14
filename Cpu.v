@@ -1,8 +1,13 @@
 `timescale 1ns / 1ps
 
 module Cpu (
+
 		input clock,
-		input reset
+		input reset,
+
+		output [31:0] debug_pc,
+		output [31:0] debug_instruction,
+		output [32 * 32 - 1 : 0] debug_registers
 	);
 
 	wire [31:0] pc_pc;
@@ -131,7 +136,9 @@ module Cpu (
 		.wb_registerWriteAddress(wb_registerWriteAddress[4:0]),
 		.wb_registerWriteData(wb_registerWriteData[31:0]),
 
-		.shouldStall(id_shouldStall)
+		.shouldStall(id_shouldStall),
+
+		.debug_registers(debug_registers[32 * 32 - 1 : 0])
 	);
 
 	IdExRegisters idExRegisters (
@@ -244,4 +251,7 @@ module Cpu (
 		.aluOutput(wb_aluOutput[31:0]),
 		.registerWriteData(wb_registerWriteData[31:0])
 	);
+
+	assign debug_pc = pc_pc;
+	assign debug_instruction = if_instruction;
 endmodule
