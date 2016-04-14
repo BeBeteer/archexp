@@ -85,8 +85,8 @@ module debugger (
 			: 4'hF;
 	wire [7:0] hex_ascii_out;
 	hex_ascii u_hex_ascii (
-		.in(hex_ascii_in),
-		.out(hex_ascii_out)
+		.in(hex_ascii_in[3:0]),
+		.out(hex_ascii_out[7:0])
 	);
 
 	wire bin_ascii_in = 
