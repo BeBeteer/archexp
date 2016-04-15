@@ -58,8 +58,7 @@ module archexp(
 		.counter(clockCounter[31:0])
 	);
 	wire clock25Mhz = clockCounter[1];
-	wire clock12_5Mhz = clockCounter[2];
-	wire cpuClock = SW_OK[2] ? clockCounter[24] : clock12_5Mhz;
+	wire cpuClock = SW_OK[2] ? clockCounter[24] : clock25Mhz;
 	Cpu cpu (
 
 		.clock(cpuClock),
