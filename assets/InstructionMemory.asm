@@ -1,8 +1,11 @@
-lw	$1, 80($0)	// 0x8c01_0050 State:0,1,3,5,9 Type:3 Code:1 (LD)
-lw	$2, 84($0)	// 0x8c02_0054 State:0,1,3,5,9 Type:3 Code:1 (LD)
-add	$3, $1, $2	// 0x0022_1820 State:0,1,2,8 Type:1 Code:3 (AD)
-sub	$4, $1, $2	// 0x0022_2022 State:0,1,2,8 Type:1 Code:4 (SU)
-and	$5, $3, $4	// 0x0064_2824 State:0,1,2,8 Type:1 Code:5 (AN)
-nor	$6, $4, $5	// 0x0085_3027 State:0,1,2,8 Type:1 Code: 6 (NO)
-sw	$6, 88($0)	// 0xac06_0058 State:0,1,4,7 Type:3 Code: 2 (ST)
-j	0	// 0x0800_0000 State:0,1 Type:2 Code:7 (JP)
+lw $1, 80($0)
+lw $6, 81($0)
+label_0:
+add $3, $0, $0
+add $4, $0, $0
+add $5, $0, $0
+add $2, $2, $1
+sub $3, $3, $1
+and $4, $4, $1
+nor $5, $5, $1
+beq $2, $1, label_0
