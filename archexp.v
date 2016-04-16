@@ -25,20 +25,16 @@ module archexp(
 	wire [31:0] cpu_pc;
 	wire [31:0] cpu_instruction;
 	wire [32 * 32 - 1 : 0] cpu_registers;
-	wire mem_w;
-	wire [31:0] Addr_out;
-	wire [31:0] Data_out;
-
-	wire [31:0] ram_data_out;
-	wire [31:0] ram_data_in;
-	wire [9:0] ram_addr;
+	wire [31:0] cpu_memoryAddress;
+	wire [31:0] cpu_memoryReadData;
+	wire cpu_shouldWriteMemory;
+	wire [31:0] cpu_memoryWriteData;
 
 	wire [11:0] terminal_addr;
 	wire terminal_write;
 	wire [7:0] terminal_in;
 	wire [7:0] terminal_out;
 
-	// U0 terminal
 	wire [9:0] vgaX;
 	wire [8:0] vgaY;
 	wire isVgaActive;
@@ -53,13 +49,15 @@ module archexp(
 		.button_pulse(),
 		.SW_OK(SW_OK[7:0])
 	);
+
 	ClockDivider clockDivider (
 		.clock(clock50Mhz),
 		.reset(reset),
 		.counter(clockCounter[31:0])
 	);
+
 	wire clock25Mhz = clockCounter[1];
-	wire cpuClock = SW_OK[2] ? clockCounter[24] : clock25Mhz;
+	wire cpuClock = SW_OK[2] ? button_out[1] && clockCounter[26] : clock25Mhz;
 	Cpu cpu (
 
 		.clock(cpuClock),
@@ -67,16 +65,21 @@ module archexp(
 
 		.debug_pc(cpu_pc[31:0]),
 		.debug_instruction(cpu_instruction[31:0]),
-		.debug_registers(cpu_registers[32 * 32 - 1 : 0])
+		.debug_registers(cpu_registers[32 * 32 - 1 : 0]),
+		.debug_memoryAddress(cpu_memoryAddress[31:0]),
+		.debug_memoryReadData(cpu_memoryReadData[31:0]),
+		.debug_shouldWriteMemory(cpu_shouldWriteMemory),
+		.debug_memoryWriteData(cpu_memoryWriteData[31:0])
 	);
+
 	debugger u_debugger (
 		.clock(clock25Mhz),
 		.cpu_pc(cpu_pc[31:0]),
 		.cpu_instruction(cpu_instruction[31:0]),
-		.cpu_mem_write(mem_w),
-		.cpu_mem_addr(Addr_out[31:0]),
-		.cpu_mem_read_data(ram_data_out[31:0]),
-		.cpu_mem_write_data(ram_data_in[31:0]),
+		.cpu_mem_addr(cpu_memoryAddress[31:0]),
+		.cpu_mem_read_data(cpu_memoryReadData[31:0]),
+		.cpu_mem_write(cpu_shouldWriteMemory),
+		.cpu_mem_write_data(cpu_memoryWriteData[31:0]),
 		.cpu_registers(cpu_registers[32 * 32 - 1 : 0]),
 		.terminal_addr(terminal_addr[11:0]),
 		.terminal_write(terminal_write),

@@ -7,7 +7,11 @@ module Cpu (
 
 		output [31:0] debug_pc,
 		output [31:0] debug_instruction,
-		output [32 * 32 - 1 : 0] debug_registers
+		output [32 * 32 - 1 : 0] debug_registers,
+		output [31:0] debug_memoryAddress,
+		output [31:0] debug_memoryReadData,
+		output debug_shouldWriteMemory,
+		output [31:0] debug_memoryWriteData
 	);
 
 	wire [31:0] pc_pc;
@@ -254,4 +258,8 @@ module Cpu (
 
 	assign debug_pc = pc_pc;
 	assign debug_instruction = if_instruction;
+	assign debug_memoryAddress = mem_aluOutput;
+	assign debug_memoryReadData = mem_memoryData;
+	assign debug_shouldWriteMemory = mem_shouldWriteMemory;
+	assign debug_memoryWriteData = mem_registerRtOrZero;
 endmodule
