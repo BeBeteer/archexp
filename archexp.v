@@ -1,6 +1,7 @@
 `timescale 1ns / 1ps
 
 module archexp(
+
 		input clock50Mhz,
 		input [3:0] BTN,
 		input [7:0] SW,
@@ -38,10 +39,10 @@ module archexp(
 	wire [7:0] terminal_out;
 
 	// U0 terminal
-	wire [9:0] x_position;
-	wire [8:0] y_position;
-	wire inside_video;
-	wire [7:0] color;
+	wire [9:0] vgaX;
+	wire [8:0] vgaY;
+	wire isVgaActive;
+	wire [7:0] vgaColor;
 
 	Anti_jitter U9 (
 		.clk(clock50Mhz),
@@ -81,27 +82,32 @@ module archexp(
 		.terminal_write(terminal_write),
 		.terminal_data(terminal_in[7:0])
 	);
-	terminal u_terminal (
+
+	Terminal terminal (
+
 		.clock(clock50Mhz),
-		.text_addr(terminal_addr[11:0]),
-		.text_write(terminal_write),
-		.text_in(terminal_in[7:0]),
-		.x_position(x_position[9:0]),
-		.y_position(y_position[8:0]),
-		.inside_video(inside_video),
-		.text_out(terminal_out[7:0]),
-		.color(color[7:0])
+
+		.isVgaActive(isVgaActive),
+		.vgaX(vgaX[9:0]),
+		.vgaY(vgaY[8:0]),
+		.vgaColor(vgaColor[7:0]),
+
+		.textAddress(terminal_addr[11:0]),
+		.textReadData(terminal_out[7:0]),
+		.shouldWriteText(terminal_write),
+		.textWriteData(terminal_in[7:0])
 	);
-	assign red = color[7:5];
-	assign green = color[4:2];
-	assign blue = color[1:0];
+	assign red = vgaColor[7:5];
+	assign green = vgaColor[4:2];
+	assign blue = vgaColor[1:0];
+
 	vga_controller U00 (
 		.clock_25mhz(clock25Mhz),
 		.reset(reset),
 		.h_sync(h_sync),
 		.v_sync(v_sync),
-		.inside_video(inside_video),
-		.x_position(x_position[9:0]),
-		.y_position(y_position[8:0])
+		.inside_video(isVgaActive),
+		.x_position(vgaX[9:0]),
+		.y_position(vgaY[8:0])
 	);
 endmodule
