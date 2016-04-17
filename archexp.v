@@ -3,17 +3,18 @@
 module archexp(
 
 		input clock50Mhz,
+
 		input [3:0] BTN,
 		input [7:0] SW,
 		output [3:0] AN,
 		output [7:0] SEGMENT,
 		output [7:0] LED,
 
+		output vgaHSync,
+		output vgaVSync,
 		output [2:0] vgaRed,
 		output [2:0] vgaGreen,
-		output [1:0] vgaBlue,
-		output vgaHSync,
-		output vgaVSync
+		output [1:0] vgaBlue
 	);
 
 	wire [3:0] button_out;
@@ -30,15 +31,15 @@ module archexp(
 	wire cpu_shouldWriteMemory;
 	wire [31:0] cpu_memoryWriteData;
 
-	wire [11:0] terminal_addr;
-	wire terminal_write;
-	wire [7:0] terminal_in;
-	wire [7:0] terminal_out;
-
 	wire [9:0] vgaX;
 	wire [8:0] vgaY;
 	wire isVgaActive;
 	wire [7:0] vgaColor;
+
+	wire [11:0] terminal_addr;
+	wire terminal_write;
+	wire [7:0] terminal_in;
+	wire [7:0] terminal_out;
 
 	Anti_jitter U9 (
 		.clk(clock50Mhz),
@@ -72,18 +73,14 @@ module archexp(
 		.debug_memoryWriteData(cpu_memoryWriteData[31:0])
 	);
 
-	debugger u_debugger (
-		.clock(clock25Mhz),
-		.cpu_pc(cpu_pc[31:0]),
-		.cpu_instruction(cpu_instruction[31:0]),
-		.cpu_mem_addr(cpu_memoryAddress[31:0]),
-		.cpu_mem_read_data(cpu_memoryReadData[31:0]),
-		.cpu_mem_write(cpu_shouldWriteMemory),
-		.cpu_mem_write_data(cpu_memoryWriteData[31:0]),
-		.cpu_registers(cpu_registers[32 * 32 - 1 : 0]),
-		.terminal_addr(terminal_addr[11:0]),
-		.terminal_write(terminal_write),
-		.terminal_data(terminal_in[7:0])
+	VgaController vgaController (
+		.clock25Mhz(clock25Mhz),
+		.reset(reset),
+		.hSync(vgaHSync),
+		.vSync(vgaVSync),
+		.isActive(isVgaActive),
+		.x(vgaX[9:0]),
+		.y(vgaY[8:0])
 	);
 
 	Terminal terminal (
@@ -104,13 +101,17 @@ module archexp(
 	assign vgaGreen = vgaColor[4:2];
 	assign vgaBlue = vgaColor[1:0];
 
-	VgaController vgaController (
-		.clock25Mhz(clock25Mhz),
-		.reset(reset),
-		.hSync(vgaHSync),
-		.vSync(vgaVSync),
-		.isActive(isVgaActive),
-		.x(vgaX[9:0]),
-		.y(vgaY[8:0])
+	debugger u_debugger (
+		.clock(clock25Mhz),
+		.cpu_pc(cpu_pc[31:0]),
+		.cpu_instruction(cpu_instruction[31:0]),
+		.cpu_mem_addr(cpu_memoryAddress[31:0]),
+		.cpu_mem_read_data(cpu_memoryReadData[31:0]),
+		.cpu_mem_write(cpu_shouldWriteMemory),
+		.cpu_mem_write_data(cpu_memoryWriteData[31:0]),
+		.cpu_registers(cpu_registers[32 * 32 - 1 : 0]),
+		.terminal_addr(terminal_addr[11:0]),
+		.terminal_write(terminal_write),
+		.terminal_data(terminal_in[7:0])
 	);
 endmodule
