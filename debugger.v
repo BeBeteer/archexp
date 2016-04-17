@@ -56,7 +56,7 @@ module debugger (
 			: is_next_terminal_addr_in_range(8, 0, 8) ? cpu_registers[32 * 6 - 1 - 4 * (terminal_next_addr - calc_terminal_addr(8, 0)) -: 4]
 			: is_next_terminal_addr_in_range(8, 16, 8) ? cpu_registers[32 * 7 - 1 - 4 * (terminal_next_addr - calc_terminal_addr(8, 16)) -: 4]
 			: is_next_terminal_addr_in_range(8, 32, 8) ? cpu_registers[32 * 8 - 1 - 4 * (terminal_next_addr - calc_terminal_addr(8, 32)) -: 4]
-			: is_next_terminal_addr_in_range(8, 49, 8) ? cpu_registers[32 * 9 - 1 - 4 * (terminal_next_addr - calc_terminal_addr(8, 48)) -: 4]
+			: is_next_terminal_addr_in_range(8, 48, 8) ? cpu_registers[32 * 9 - 1 - 4 * (terminal_next_addr - calc_terminal_addr(8, 48)) -: 4]
 			: is_next_terminal_addr_in_range(8, 64, 8) ? cpu_registers[32 * 10 - 1 - 4 * (terminal_next_addr - calc_terminal_addr(8, 64)) -: 4]
 			: is_next_terminal_addr_in_range(9, 0, 8) ? cpu_registers[32 * 11 - 1 - 4 * (terminal_next_addr - calc_terminal_addr(9, 0)) -: 4]
 			: is_next_terminal_addr_in_range(9, 16, 8) ? cpu_registers[32 * 12 - 1 - 4 * (terminal_next_addr - calc_terminal_addr(9, 16)) -: 4]
