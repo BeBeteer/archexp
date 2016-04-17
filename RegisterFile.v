@@ -29,7 +29,7 @@ module RegisterFile (
 	assign readDataB = readAddressB == 0 ? 32'b0 : registers[readAddressB];
 
 	integer j;
-	always @(negedge clock or posedge reset) begin
+	always @(negedge clock) begin
 		if (reset) begin
 			for (j = 1; j < 32; j = j + 1) begin
 				registers[j] <= 0;

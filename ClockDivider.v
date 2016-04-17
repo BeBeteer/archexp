@@ -6,7 +6,7 @@ module ClockDivider(
 		output reg [31:0] counter
 	);
 
-	always @(posedge clock or posedge reset) begin
+	always @(posedge clock) begin
 		if (reset) begin
 			counter <= 0;
 		end else begin

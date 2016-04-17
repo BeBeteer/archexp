@@ -9,7 +9,7 @@ module Pc (
 		output reg [31:0] pc = 0
 	);
 
-	always @(posedge clock or posedge reset) begin
+	always @(posedge clock) begin
 		if (reset) begin
 			pc <= 0;
 		end else begin

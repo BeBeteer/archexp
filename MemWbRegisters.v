@@ -18,7 +18,7 @@ module MemWbRegisters (
 		output reg [31:0] wb_aluOutput = 0
 	);
 
-	always @(posedge clock or posedge reset) begin
+	always @(posedge clock) begin
 
 		if (reset) begin
 

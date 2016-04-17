@@ -22,7 +22,7 @@ module ExMemRegisters (
 		output reg [31:0] mem_registerRtOrZero = 0
 	);
 
-	always @(posedge clock or posedge reset) begin
+	always @(posedge clock) begin
 
 		if (reset) begin
 

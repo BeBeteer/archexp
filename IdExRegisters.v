@@ -38,7 +38,7 @@ module IdExRegisters (
 		output reg ex_shouldWriteMemory = 0
 	);
 
-	always @(posedge clock or posedge reset) begin
+	always @(posedge clock) begin
 
 		if (reset) begin
 

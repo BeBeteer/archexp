@@ -14,7 +14,7 @@ module IfIdRegisters (
 		output reg [31:0] id_instruction = 0
 	);
 
-	always @(posedge clock or posedge reset) begin
+	always @(posedge clock) begin
 
 		if (reset) begin
 

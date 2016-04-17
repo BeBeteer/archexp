@@ -26,7 +26,7 @@ module VgaController (
 	reg [9:0] hCounter = 0;
 	reg [9:0] vCounter = 0;
 
-	always @(posedge clock25Mhz or posedge reset) begin
+	always @(posedge clock25Mhz) begin
 		if (reset) begin
 			hCounter <= 0;
 		end else if (hCounter == H_TOTAL - 1) begin
@@ -36,7 +36,7 @@ module VgaController (
 		end
 	end
 
-	always @(posedge clock25Mhz or posedge reset) begin
+	always @(posedge clock25Mhz) begin
 		if (reset) begin
 			vCounter <= 0;
 		end else if (hCounter == H_TOTAL - 1) begin
