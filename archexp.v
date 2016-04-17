@@ -9,11 +9,11 @@ module archexp(
 		output [7:0] SEGMENT,
 		output [7:0] LED,
 
-		output [2:0] red,
-		output [2:0] green,
-		output [1:0] blue,
-		output h_sync,
-		output v_sync
+		output [2:0] vgaRed,
+		output [2:0] vgaGreen,
+		output [1:0] vgaBlue,
+		output vgaHSync,
+		output vgaVSync
 	);
 
 	wire [3:0] button_out;
@@ -100,17 +100,17 @@ module archexp(
 		.shouldWriteText(terminal_write),
 		.textWriteData(terminal_in[7:0])
 	);
-	assign red = vgaColor[7:5];
-	assign green = vgaColor[4:2];
-	assign blue = vgaColor[1:0];
+	assign vgaRed = vgaColor[7:5];
+	assign vgaGreen = vgaColor[4:2];
+	assign vgaBlue = vgaColor[1:0];
 
-	vga_controller U00 (
-		.clock_25mhz(clock25Mhz),
+	VgaController vgaController (
+		.clock25Mhz(clock25Mhz),
 		.reset(reset),
-		.h_sync(h_sync),
-		.v_sync(v_sync),
-		.inside_video(isVgaActive),
-		.x_position(vgaX[9:0]),
-		.y_position(vgaY[8:0])
+		.hSync(vgaHSync),
+		.vSync(vgaVSync),
+		.isActive(isVgaActive),
+		.x(vgaX[9:0]),
+		.y(vgaY[8:0])
 	);
 endmodule
