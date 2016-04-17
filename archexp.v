@@ -57,8 +57,7 @@ module archexp(
 		.counter(clockCounter[31:0])
 	);
 
-	wire clock25Mhz = clockCounter[1];
-	wire cpuClock = SW_OK[2] ? button_out[1] && clockCounter[26] : clock25Mhz;
+	wire cpuClock = ~button_out[1];
 	Cpu cpu (
 
 		.clock(cpuClock),
@@ -73,6 +72,7 @@ module archexp(
 		.debug_memoryWriteData(cpu_memoryWriteData[31:0])
 	);
 
+	wire clock25Mhz = clockCounter[1];
 	VgaController vgaController (
 		.clock25Mhz(clock25Mhz),
 		.reset(reset),
