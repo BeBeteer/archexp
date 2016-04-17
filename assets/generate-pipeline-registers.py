@@ -66,7 +66,7 @@ for port in portList:
 print('''
 	);
 
-	always @(posedge clock or posedge reset) begin
+	always @(posedge clock) begin
 
 		if (reset) begin
 ''')
