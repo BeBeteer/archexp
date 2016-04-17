@@ -14,14 +14,14 @@ module VgaController (
 	);
 
 	// SYNC, BPORCH, VIDEO, FPORCH.
-	localparam H_SYNC = 96;
-	localparam H_BPORCH = 144;
-	localparam H_FPORCH = 784;
-	localparam H_TOTAL = 800;
-	localparam V_SYNC = 2;
-	localparam V_BPORCH = 35;
-	localparam V_FPORCH = 511;
-	localparam V_TOTAL = 525;
+	localparam H_SYNC = 10'd96;
+	localparam H_BPORCH = 10'd144;
+	localparam H_FPORCH = 10'd784;
+	localparam H_TOTAL = 10'd800;
+	localparam V_SYNC = 10'd2;
+	localparam V_BPORCH = 10'd35;
+	localparam V_FPORCH = 10'd511;
+	localparam V_TOTAL = 10'd525;
 
 	reg [9:0] hCounter = 0;
 	reg [9:0] vCounter = 0;
@@ -29,7 +29,7 @@ module VgaController (
 	always @(posedge clock25Mhz) begin
 		if (reset) begin
 			hCounter <= 0;
-		end else if (hCounter == H_TOTAL - 1) begin
+		end else if (hCounter == H_TOTAL - 1'b1) begin
 			hCounter <= 0;
 		end else begin
 			hCounter <= hCounter + 1'b1;
@@ -39,7 +39,7 @@ module VgaController (
 	always @(posedge clock25Mhz) begin
 		if (reset) begin
 			vCounter <= 0;
-		end else if (hCounter == H_TOTAL - 1) begin
+		end else if (hCounter == H_TOTAL - 1'b1) begin
 			if (vCounter == V_TOTAL - 1) begin
 				vCounter <= 0;
 			end else begin
@@ -53,5 +53,5 @@ module VgaController (
 
 	assign isActive = (hCounter >= H_BPORCH) && (hCounter < H_FPORCH) && (vCounter >= V_BPORCH) && (vCounter < V_FPORCH) ? 1'b1 : 1'b0;
 	assign x = hCounter - H_BPORCH;
-	assign y = vCounter - V_BPORCH;
+	assign y = {vCounter - V_BPORCH}[8:0];
 endmodule
