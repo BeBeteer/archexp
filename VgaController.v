@@ -48,10 +48,10 @@ module VgaController (
 		end
 	end
 
-	assign hSync = hCounter < H_SYNC ? 0 : 1;
-	assign vSync = vCounter < V_SYNC ? 0 : 1;
+	assign hSync = hCounter < H_SYNC ? 1'b0 : 1'b1;
+	assign vSync = vCounter < V_SYNC ? 1'b0 : 1'b1;
 
-	assign isActive = (hCounter >= H_BPORCH) && (hCounter < H_FPORCH) && (vCounter >= V_BPORCH) && (vCounter < V_FPORCH) ? 1 : 0;
+	assign isActive = (hCounter >= H_BPORCH) && (hCounter < H_FPORCH) && (vCounter >= V_BPORCH) && (vCounter < V_FPORCH) ? 1'b1 : 1'b0;
 	assign x = hCounter - H_BPORCH;
 	assign y = vCounter - V_BPORCH;
 endmodule
