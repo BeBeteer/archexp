@@ -57,7 +57,7 @@ module archexp(
 		.counter(clockCounter[31:0])
 	);
 
-	wire cpuClock = ~button_out[1];
+	wire cpuClock = ~button_out[1];	// So that memory read operates before CPU.
 	Cpu cpu (
 
 		.clock(cpuClock),
