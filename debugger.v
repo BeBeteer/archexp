@@ -97,6 +97,12 @@ module debugger (
 		.out(bin_ascii_out[7:0])
 	);
 
+	wire [4 * 8 * 8 - 1 : 0] disassembler_out;
+	Disassembler disassembler (
+		.instruction(cpu_instruction[31:0]),
+		.text(disassembler_out[4 * 8 * 8 - 1 : 0])
+	);
+
 	wire [0 : 3 * 8 - 1] PC_PROMPT = "PC:";
 	wire [0 : 5 * 8 - 1] INST_PROMPT = "Inst:";
 	wire [0 : 6 * 8 - 1] MEM_ADDR_PROMPT = "MAddr:";
@@ -162,6 +168,8 @@ module debugger (
 				: is_next_terminal_addr_in_range(12, 64, 8) ? hex_ascii_out
 				: is_next_terminal_addr_in_range(13, 0, 8) ? hex_ascii_out
 				: is_next_terminal_addr_in_range(13, 16, 8) ? hex_ascii_out
+
+				: is_next_terminal_addr_in_range(15, 0, 32) ? disassembler_out[32 * 8 - 1 - 8 * (terminal_next_addr - calc_terminal_addr(15, 0)) -: 8]
 
 				: 8'b0;
 	end
