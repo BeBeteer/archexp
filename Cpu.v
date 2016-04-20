@@ -5,16 +5,27 @@ module Cpu (
 		input clock,
 		input reset,
 
-		output [31:0] debug_pc,
-		output [31:0] debug_instruction,
-		output [32 * 32 - 1 : 0] debug_registers,
-		output [31:0] debug_memoryAddress,
-		output [31:0] debug_memoryReadData,
-		output debug_shouldWriteMemory,
-		output [31:0] debug_memoryWriteData
+		output [31:0] debug_if_pc,
+		output [31:0] debug_if_nextPc,
+		output [31:0] debug_if_instruction,
+		output [31:0] debug_id_instruction,
+		output [32 * 32 - 1 : 0] debug_id_registers,
+		output [31:0] debug_ex_instruction,
+		output [31:0] debug_ex_aluInputA,
+		output [31:0] debug_ex_aluInputB,
+		output [31:0] debug_ex_aluOutput,
+		output [31:0] debug_mem_instruction,
+		output [31:0] debug_mem_memoryAddress,
+		output [31:0] debug_mem_memoryReadData,
+		output debug_mem_shouldWriteMemory,
+		output [31:0] debug_mem_memoryWriteData,
+		output [31:0] debug_wb_instruction,
+		output debug_wb_shouldWriteRegister,
+		output [4:0] debug_wb_registerWriteAddress,
+		output [31:0] debug_wb_registerWriteData
 	);
 
-	wire [31:0] pc_pc;
+	wire [31:0] if_pc;
 
 	wire [31:0] if_pc_4;
 	wire [31:0] if_instruction;
@@ -75,14 +86,14 @@ module Cpu (
 		.reset(reset),
 
 		.nextPc(if_nextPc[31:0]),
-		.pc(pc_pc[31:0])
+		.pc(if_pc[31:0])
 	);
 
 	IfStage ifStage (
 
 		.clock(clock),
 
-		.pc(pc_pc[31:0]),
+		.pc(if_pc[31:0]),
 
 		.id_shouldJumpOrBranch(id_shouldJumpOrBranch),
 		.id_jumpOrBranchPc(id_jumpOrBranchPc[31:0]),
@@ -142,7 +153,7 @@ module Cpu (
 
 		.shouldStall(id_shouldStall),
 
-		.debug_registers(debug_registers[32 * 32 - 1 : 0])
+		.debug_registers(debug_id_registers[32 * 32 - 1 : 0])
 	);
 
 	IdExRegisters idExRegisters (
@@ -195,7 +206,10 @@ module Cpu (
 		.registerRsOrPc_4(ex_registerRsOrPc_4[31:0]),
 		.registerRtOrZero(ex_registerRtOrZero[31:0]),
 
-		.aluOutput(ex_aluOutput[31:0])
+		.aluOutput(ex_aluOutput[31:0]),
+
+		.debug_aluInputA(debug_ex_aluInputA[31:0]),
+		.debug_aluInputB(debug_ex_aluInputB[31:0])
 	);
 
 	ExMemRegisters exMemRegisters (
@@ -256,10 +270,28 @@ module Cpu (
 		.registerWriteData(wb_registerWriteData[31:0])
 	);
 
-	assign debug_pc = pc_pc;
-	assign debug_instruction = if_instruction;
-	assign debug_memoryAddress = mem_aluOutput;
-	assign debug_memoryReadData = mem_memoryData;
-	assign debug_shouldWriteMemory = mem_shouldWriteMemory;
-	assign debug_memoryWriteData = mem_registerRtOrZero;
+	DebugRegisters debugRegisters (
+
+		.clock(clock),
+		.reset(reset),
+
+		.id_instruction(debug_id_instruction[31:0]),
+
+		.ex_instruction(debug_ex_instruction[31:0]),
+		.mem_instruction(debug_mem_instruction[31:0]),
+		.wb_instruction(debug_wb_instruction[31:0])
+	);
+
+	assign debug_if_pc = if_pc[31:0];
+	assign debug_if_nextPc = if_nextPc[31:0];
+	assign debug_if_instruction = if_instruction[31:0];
+	assign debug_id_instruction = id_instruction[31:0];
+	assign debug_ex_aluOutput = ex_aluOutput[31:0];
+	assign debug_mem_memoryAddress = mem_aluOutput[31:0];
+	assign debug_mem_memoryReadData = mem_memoryData[31:0];
+	assign debug_mem_shouldWriteMemory = mem_shouldWriteMemory;
+	assign debug_mem_memoryWriteData = mem_registerRtOrZero[31:0];
+	assign debug_wb_shouldWriteRegister = wb_shouldWriteRegister;
+	assign debug_wb_registerWriteAddress = wb_registerWriteAddress[4:0];
+	assign debug_wb_registerWriteData = wb_registerWriteData[31:0];
 endmodule

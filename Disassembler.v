@@ -6,7 +6,7 @@ module Disassembler (
 
 		input [31:0] instruction,
 
-		output [4 * 8 * 8 - 1 : 0] text
+		output [32 * 8 - 1 : 0] text
 	);
 
 	wire [5:0] code = instruction[31:26];

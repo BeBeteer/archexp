@@ -23,23 +23,34 @@ module archexp(
 
 	wire [31:0] clockCounter;
 
-	wire [31:0] cpu_pc;
-	wire [31:0] cpu_instruction;
-	wire [32 * 32 - 1 : 0] cpu_registers;
-	wire [31:0] cpu_memoryAddress;
-	wire [31:0] cpu_memoryReadData;
-	wire cpu_shouldWriteMemory;
-	wire [31:0] cpu_memoryWriteData;
+	wire [31:0] cpu_if_pc;
+	wire [31:0] cpu_if_nextPc;
+	wire [31:0] cpu_if_instruction;
+	wire [31:0] cpu_id_instruction;
+	wire [32 * 32 - 1 : 0] cpu_id_registers;
+	wire [31:0] cpu_ex_instruction;
+	wire [31:0] cpu_ex_aluInputA;
+	wire [31:0] cpu_ex_aluInputB;
+	wire [31:0] cpu_ex_aluOutput;
+	wire [31:0] cpu_mem_instruction;
+	wire [31:0] cpu_mem_memoryAddress;
+	wire [31:0] cpu_mem_memoryReadData;
+	wire cpu_mem_shouldWriteMemory;
+	wire [31:0] cpu_mem_memoryWriteData;
+	wire [31:0] cpu_wb_instruction;
+	wire cpu_wb_shouldWriteRegister;
+	wire [4:0] cpu_wb_registerWriteAddress;
+	wire [31:0] cpu_wb_registerWriteData;
 
 	wire [9:0] vgaX;
 	wire [8:0] vgaY;
 	wire isVgaActive;
 	wire [7:0] vgaColor;
 
-	wire [11:0] terminal_addr;
-	wire terminal_write;
-	wire [7:0] terminal_in;
-	wire [7:0] terminal_out;
+	wire [11:0] terminalAddress;
+	wire shouldWriteTerminal;
+	wire [7:0] terminalWriteData;
+	wire [7:0] terminalReadData;
 
 	Anti_jitter U9 (
 		.clk(clock50Mhz),
@@ -63,13 +74,24 @@ module archexp(
 		.clock(cpuClock),
 		.reset(reset),
 
-		.debug_pc(cpu_pc[31:0]),
-		.debug_instruction(cpu_instruction[31:0]),
-		.debug_registers(cpu_registers[32 * 32 - 1 : 0]),
-		.debug_memoryAddress(cpu_memoryAddress[31:0]),
-		.debug_memoryReadData(cpu_memoryReadData[31:0]),
-		.debug_shouldWriteMemory(cpu_shouldWriteMemory),
-		.debug_memoryWriteData(cpu_memoryWriteData[31:0])
+		.debug_if_pc(cpu_if_pc[31:0]),
+		.debug_if_nextPc(cpu_if_nextPc[31:0]),
+		.debug_if_instruction(cpu_if_instruction[31:0]),
+		.debug_id_instruction(cpu_id_instruction[31:0]),
+		.debug_id_registers(cpu_id_registers[32 * 32 - 1 : 0]),
+		.debug_ex_instruction(cpu_ex_instruction[31:0]),
+		.debug_ex_aluInputA(cpu_ex_aluInputA[31:0]),
+		.debug_ex_aluInputB(cpu_ex_aluInputB[31:0]),
+		.debug_ex_aluOutput(cpu_ex_aluOutput[31:0]),
+		.debug_mem_instruction(cpu_mem_instruction[31:0]),
+		.debug_mem_memoryAddress(cpu_mem_memoryAddress[31:0]),
+		.debug_mem_memoryReadData(cpu_mem_memoryReadData[31:0]),
+		.debug_mem_shouldWriteMemory(cpu_mem_shouldWriteMemory),
+		.debug_mem_memoryWriteData(cpu_mem_memoryWriteData[31:0]),
+		.debug_wb_instruction(cpu_wb_instruction[31:0]),
+		.debug_wb_shouldWriteRegister(cpu_wb_shouldWriteRegister),
+		.debug_wb_registerWriteAddress(cpu_wb_registerWriteAddress[4:0]),
+		.debug_wb_registerWriteData(cpu_wb_registerWriteData[31:0])
 	);
 
 	wire clock25Mhz = clockCounter[1];
@@ -92,26 +114,40 @@ module archexp(
 		.vgaY(vgaY[8:0]),
 		.vgaColor(vgaColor[7:0]),
 
-		.textAddress(terminal_addr[11:0]),
-		.textReadData(terminal_out[7:0]),
-		.shouldWriteText(terminal_write),
-		.textWriteData(terminal_in[7:0])
+		.textAddress(terminalAddress[11:0]),
+		.textReadData(terminalReadData[7:0]),
+		.shouldWriteText(shouldWriteTerminal),
+		.textWriteData(terminalWriteData[7:0])
 	);
 	assign vgaRed = vgaColor[7:5];
 	assign vgaGreen = vgaColor[4:2];
 	assign vgaBlue = vgaColor[1:0];
 
-	debugger u_debugger (
+	Debugger debugger (
+
 		.clock(clock25Mhz),
-		.cpu_pc(cpu_pc[31:0]),
-		.cpu_instruction(cpu_instruction[31:0]),
-		.cpu_mem_addr(cpu_memoryAddress[31:0]),
-		.cpu_mem_read_data(cpu_memoryReadData[31:0]),
-		.cpu_mem_write(cpu_shouldWriteMemory),
-		.cpu_mem_write_data(cpu_memoryWriteData[31:0]),
-		.cpu_registers(cpu_registers[32 * 32 - 1 : 0]),
-		.terminal_addr(terminal_addr[11:0]),
-		.terminal_write(terminal_write),
-		.terminal_data(terminal_in[7:0])
+
+		.cpu_if_pc(cpu_if_pc[31:0]),
+		.cpu_if_nextPc(cpu_if_nextPc[31:0]),
+		.cpu_if_instruction(cpu_if_instruction[31:0]),
+		.cpu_id_instruction(cpu_id_instruction[31:0]),
+		.cpu_id_registers(cpu_id_registers[32 * 32 - 1 : 0]),
+		.cpu_ex_instruction(cpu_ex_instruction[31:0]),
+		.cpu_ex_aluInputA(cpu_ex_aluInputA[31:0]),
+		.cpu_ex_aluInputB(cpu_ex_aluInputB[31:0]),
+		.cpu_ex_aluOutput(cpu_ex_aluOutput[31:0]),
+		.cpu_mem_instruction(cpu_mem_instruction[31:0]),
+		.cpu_mem_memoryAddress(cpu_mem_memoryAddress[31:0]),
+		.cpu_mem_memoryReadData(cpu_mem_memoryReadData[31:0]),
+		.cpu_mem_shouldWriteMemory(cpu_mem_shouldWriteMemory),
+		.cpu_mem_memoryWriteData(cpu_mem_memoryWriteData[31:0]),
+		.cpu_wb_instruction(cpu_wb_instruction[31:0]),
+		.cpu_wb_shouldWriteRegister(cpu_wb_shouldWriteRegister),
+		.cpu_wb_registerWriteAddress(cpu_wb_registerWriteAddress[4:0]),
+		.cpu_wb_registerWriteData(cpu_wb_registerWriteData[31:0]),
+
+		.terminalAddress(terminalAddress[11:0]),
+		.shouldWriteTerminal(shouldWriteTerminal),
+		.terminalWriteData(terminalWriteData[7:0])
 	);
 endmodule

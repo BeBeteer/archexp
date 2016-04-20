@@ -1,0 +1,30 @@
+Zhang Hai's Pipelined CPU
+================================================================================
+IF Stage: nop
+--------------------------------------------------------------------------------
+PC: 0xFFFFFFFF                          Next PC: 0xFFFFFFFF
+================================================================================
+ID Stage: nop
+--------------------------------------------------------------------------------
+Registers:
+0xFFFFFFFF       0xFFFFFFFF       0xFFFFFFFF       0xFFFFFFFF       0xFFFFFFFF
+0xFFFFFFFF       0xFFFFFFFF       0xFFFFFFFF       0xFFFFFFFF       0xFFFFFFFF
+0xFFFFFFFF       0xFFFFFFFF       0xFFFFFFFF       0xFFFFFFFF       0xFFFFFFFF
+0xFFFFFFFF       0xFFFFFFFF       0xFFFFFFFF       0xFFFFFFFF       0xFFFFFFFF
+0xFFFFFFFF       0xFFFFFFFF       0xFFFFFFFF       0xFFFFFFFF       0xFFFFFFFF
+0xFFFFFFFF       0xFFFFFFFF
+================================================================================
+EX Stage: nop
+--------------------------------------------------------------------------------
+ALU Input A: 0xFFFFFFFF                 ALU Input B: 0xFFFFFFFF
+ALU Output: 0xFFFFFFFF
+================================================================================
+MEM Stage: nop
+--------------------------------------------------------------------------------
+Memory Address: 0xFFFFFFFF              Memory Read Data: 0xFFFFFFFF
+Memory Write Enabled: 0                 Memory Write Data: 0xFFFFFFFF
+================================================================================
+WB Stage: nop
+--------------------------------------------------------------------------------
+Register Write Enabled: 1               Register Write Address: 0x1F
+Register Write Data: 0xFFFFFFFF

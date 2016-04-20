@@ -12,7 +12,10 @@ module ExStage (
 		input [31:0] registerRsOrPc_4,
 		input [31:0] registerRtOrZero,
 
-		output [31:0] aluOutput
+		output [31:0] aluOutput,
+
+		output [31:0] debug_aluInputA,
+		output [31:0] debug_aluInputB
 	);
 
 	wire [31:0] aluInputA = shouldAluUseShiftAmountElseRegisterRsOrPc_4 ? shiftAmount : registerRsOrPc_4;
@@ -23,4 +26,7 @@ module ExStage (
 		.operation(aluOperation[3:0]),
 		.output_(aluOutput[31:0])
 	);
+
+	assign debug_aluInputA = aluInputA;
+	assign debug_aluInputB = aluInputB;
 endmodule
