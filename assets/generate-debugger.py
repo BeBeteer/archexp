@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+from codecs import encode
 from collections import namedtuple
 from enum import Enum, unique
 
@@ -60,25 +61,26 @@ booleanTextInputList = []
 dataList = []
 for interpolation in interpolationList:
     address = getTerminalAddress(interpolation)
-    length = None
-    source = None
     if interpolation.type is InterpolationType.INSTRUCTION:
         length = 32
         disassemblerInputList.append('nextTerminalAddress >= {} && nextTerminalAddress < {} ? {}'.format(address, address + length, next(inputIter)))
         source = 'disassemblerOutput'
+        dataList.append('nextTerminalAddress >= {} && nextTerminalAddress < {} ? {}[{} - 8 * (nextTerminalAddress - {}) -: 8]'.format(address, address + length, source, length * 8 - 1, address))
     elif interpolation.type is InterpolationType.HEX_8:
         length = 8
         hexCharacterInputList.append('nextTerminalAddress >= {} && nextTerminalAddress < {} ? {}[31 - 4 * (nextTerminalAddress - {}) -: 4]'.format(address, address + length, next(inputIter), address))
         source = 'hexCharacterOutput'
+        dataList.append('nextTerminalAddress >= {} && nextTerminalAddress < {} ? {}'.format(address, address + length, source))
     elif interpolation.type is InterpolationType.HEX_2:
         length = 2
         hexCharacterInputList.append('nextTerminalAddress >= {} && nextTerminalAddress < {} ? {}[7 - 4 * (nextTerminalAddress - {}) -: 4]'.format(address, address + length, next(inputIter), address))
         source = 'hexCharacterOutput'
+        dataList.append('nextTerminalAddress >= {} && nextTerminalAddress < {} ? {}'.format(address, address + length, source))
     elif interpolation.type is InterpolationType.BOOLEAN:
         length = 5
         booleanTextInputList.append('nextTerminalAddress >= {} && nextTerminalAddress < {} ? {}'.format(address, address + length, next(inputIter)))
         source = 'booleanTextOutput'
-    dataList.append('nextTerminalAddress >= {} && nextTerminalAddress < {} ? {}[{} - 8 * (nextTerminalAddress - {}) -: 8]'.format(address, address + length, source, length * 8 - 1, address))
+        dataList.append('nextTerminalAddress >= {} && nextTerminalAddress < {} ? {}[{} - 8 * (nextTerminalAddress - {}) -: 8]'.format(address, address + length, source, length * 8 - 1, address))
 
 def printLineList(firstLine, lineList, lastLine = None):
     print(firstLine)
@@ -98,20 +100,18 @@ print()
 printLineList('wire [3:0] hexCharacterInput =', hexCharacterInputList, '4\'hFF')
 print()
 printLineList('wire booleanTextInput =', booleanTextInputList, '1\'b1')
-
 print()
+printLineList('terminalWriteData <=', dataList, 'backgroundCharacter')
 
-print('wire [{}:0] backgroundText = {{'.format(2400 * 8 - 1))
-isFirst = True
-for line in designLineList:
-    if isFirst:
-        isFirst = False
-    else:
-        print(',')
-    print('		"{}"'.format(line), end='')
-print('''
-};''')
-
-print()
-
-printLineList('terminalWriteData <=', dataList, 'backgroundText[{} - 8 * nextTerminalAddress -: 8]'.format(2400 * 8 - 1))
+with open('Background.coe', 'w') as backgroundFile:
+    print('''memory_initialization_radix=16;
+memory_initialization_vector=''', file=backgroundFile)
+    isFirst = True
+    for line in designLineList:
+        for character in line:
+            if isFirst:
+                isFirst = False
+            else:
+                print(', ', end='', file=backgroundFile)
+            print("{:02x}".format(ord(character)), end='', file=backgroundFile)
+    print(';', file=backgroundFile)
