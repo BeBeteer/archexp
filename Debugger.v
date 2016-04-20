@@ -124,7 +124,7 @@ module Debugger (
 			: nextTerminalAddress >= 1741 && nextTerminalAddress < 1749 ? cpu_mem_memoryWriteData[31 - 4 * (nextTerminalAddress - 1741) -: 4]
 			: nextTerminalAddress >= 1986 && nextTerminalAddress < 1988 ? cpu_wb_registerWriteAddress[7 - 4 * (nextTerminalAddress - 1986) -: 4]
 			: nextTerminalAddress >= 2023 && nextTerminalAddress < 2031 ? cpu_wb_registerWriteData[31 - 4 * (nextTerminalAddress - 2023) -: 4]
-			: 4'hFF;
+			: 4'hF;
 	wire [7:0] hexCharacterOutput;
 	HexCharacterConverter hexCharacterConverter (
 		.hex(hexCharacterInput[3:0]),
