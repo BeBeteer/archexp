@@ -29,169 +29,205 @@ module Debugger (
 	);
 
 	localparam TERMINAL_ADDRESS_MAX = 2399;
-	localparam TERMINAL_COLUMN_SIZE = 80;
 
 	assign shouldWriteTerminal = 1;
 
-	function [11:0] getTerminalAddress (
-			input [4:0] row,
-			input [6:0] column
-		);
-		getTerminalAddress = row * TERMINAL_COLUMN_SIZE + column;
-	endfunction
-
 	wire [11:0] nextTerminalAddress = terminalAddress < TERMINAL_ADDRESS_MAX ? terminalAddress + 1'b1 : 0;
 
-	function isTerminalAddressInRange (
-			input [4:0] row,
-			input [6:0] columnStart,
-			input [6:0] columnLength
-		);
-		isTerminalAddressInRange = nextTerminalAddress >= getTerminalAddress(row[4:0], columnStart[6:0]) && nextTerminalAddress < getTerminalAddress(row[4:0], {columnStart + columnLength}[6:0]);
-	endfunction
-
-	function getDistanceFromTerminalAddress (
-			input [4:0] row,
-			input [6:0] column
-		);
-		getDistanceFromTerminalAddress = nextTerminalAddress - getTerminalAddress(row[4:0], column[6:0]);
-	endfunction
-
-	wire [3:0] hexAsciiInput =
-			isTerminalAddressInRange(0, 8, 8) ? cpu_pc[31 - 4 * getDistanceFromTerminalAddress(0, 8) -: 4]
-
-			: isTerminalAddressInRange(1, 8, 8) ? cpu_instruction[31 - 4 * getDistanceFromTerminalAddress(1, 8) -: 4]
-
-			: isTerminalAddressInRange(2, 8, 8) ? cpu_mem_addr[31 - 4 * getDistanceFromTerminalAddress(2, 8) -: 4]
-			: isTerminalAddressInRange(3, 8, 8) ? cpu_mem_read_data[31 - 4 * getDistanceFromTerminalAddress(3, 8) -: 4]
-			: isTerminalAddressInRange(5, 8, 8) ? cpu_mem_write_data[31 - 4 * getDistanceFromTerminalAddress(5, 8) -: 4]
-
-			: isTerminalAddressInRange(7, 0, 8) ? cpu_registers[32 * 1 - 1 - 4 * getDistanceFromTerminalAddress(7, 0) -: 4]
-			: isTerminalAddressInRange(7, 16, 8) ? cpu_registers[32 * 2 - 1 - 4 * getDistanceFromTerminalAddress(7, 16) -: 4]
-			: isTerminalAddressInRange(7, 32, 8) ? cpu_registers[32 * 3 - 1 - 4 * getDistanceFromTerminalAddress(7, 32) -: 4]
-			: isTerminalAddressInRange(7, 48, 8) ? cpu_registers[32 * 4 - 1 - 4 * getDistanceFromTerminalAddress(7, 48) -: 4]
-			: isTerminalAddressInRange(7, 64, 8) ? cpu_registers[32 * 5 - 1 - 4 * getDistanceFromTerminalAddress(7, 64) -: 4]
-			: isTerminalAddressInRange(8, 0, 8) ? cpu_registers[32 * 6 - 1 - 4 * getDistanceFromTerminalAddress(8, 0) -: 4]
-			: isTerminalAddressInRange(8, 16, 8) ? cpu_registers[32 * 7 - 1 - 4 * getDistanceFromTerminalAddress(8, 16) -: 4]
-			: isTerminalAddressInRange(8, 32, 8) ? cpu_registers[32 * 8 - 1 - 4 * getDistanceFromTerminalAddress(8, 32) -: 4]
-			: isTerminalAddressInRange(8, 48, 8) ? cpu_registers[32 * 9 - 1 - 4 * getDistanceFromTerminalAddress(8, 48) -: 4]
-			: isTerminalAddressInRange(8, 64, 8) ? cpu_registers[32 * 10 - 1 - 4 * getDistanceFromTerminalAddress(8, 64) -: 4]
-			: isTerminalAddressInRange(9, 0, 8) ? cpu_registers[32 * 11 - 1 - 4 * getDistanceFromTerminalAddress(9, 0) -: 4]
-			: isTerminalAddressInRange(9, 16, 8) ? cpu_registers[32 * 12 - 1 - 4 * getDistanceFromTerminalAddress(9, 16) -: 4]
-			: isTerminalAddressInRange(9, 32, 8) ? cpu_registers[32 * 13 - 1 - 4 * getDistanceFromTerminalAddress(9, 32) -: 4]
-			: isTerminalAddressInRange(9, 48, 8) ? cpu_registers[32 * 14 - 1 - 4 * getDistanceFromTerminalAddress(9, 48) -: 4]
-			: isTerminalAddressInRange(9, 64, 8) ? cpu_registers[32 * 15 - 1 - 4 * getDistanceFromTerminalAddress(9, 64) -: 4]
-			: isTerminalAddressInRange(10, 0, 8) ? cpu_registers[32 * 16 - 1 - 4 * getDistanceFromTerminalAddress(10, 0) -: 4]
-			: isTerminalAddressInRange(10, 16, 8) ? cpu_registers[32 * 17 - 1 - 4 * getDistanceFromTerminalAddress(10, 16) -: 4]
-			: isTerminalAddressInRange(10, 32, 8) ? cpu_registers[32 * 18 - 1 - 4 * getDistanceFromTerminalAddress(10, 32) -: 4]
-			: isTerminalAddressInRange(10, 48, 8) ? cpu_registers[32 * 19 - 1 - 4 * getDistanceFromTerminalAddress(10, 48) -: 4]
-			: isTerminalAddressInRange(10, 64, 8) ? cpu_registers[32 * 20 - 1 - 4 * getDistanceFromTerminalAddress(10, 64) -: 4]
-			: isTerminalAddressInRange(11, 0, 8) ? cpu_registers[32 * 21 - 1 - 4 * getDistanceFromTerminalAddress(11, 0) -: 4]
-			: isTerminalAddressInRange(11, 16, 8) ? cpu_registers[32 * 22 - 1 - 4 * getDistanceFromTerminalAddress(11, 16) -: 4]
-			: isTerminalAddressInRange(11, 32, 8) ? cpu_registers[32 * 23 - 1 - 4 * getDistanceFromTerminalAddress(11, 32) -: 4]
-			: isTerminalAddressInRange(11, 48, 8) ? cpu_registers[32 * 24 - 1 - 4 * getDistanceFromTerminalAddress(11, 48) -: 4]
-			: isTerminalAddressInRange(11, 64, 8) ? cpu_registers[32 * 25 - 1 - 4 * getDistanceFromTerminalAddress(11, 64) -: 4]
-			: isTerminalAddressInRange(12, 0, 8) ? cpu_registers[32 * 26 - 1 - 4 * getDistanceFromTerminalAddress(12, 0) -: 4]
-			: isTerminalAddressInRange(12, 16, 8) ? cpu_registers[32 * 27 - 1 - 4 * getDistanceFromTerminalAddress(12, 16) -: 4]
-			: isTerminalAddressInRange(12, 32, 8) ? cpu_registers[32 * 28 - 1 - 4 * getDistanceFromTerminalAddress(12, 32) -: 4]
-			: isTerminalAddressInRange(12, 48, 8) ? cpu_registers[32 * 29 - 1 - 4 * getDistanceFromTerminalAddress(12, 48) -: 4]
-			: isTerminalAddressInRange(12, 64, 8) ? cpu_registers[32 * 30 - 1 - 4 * getDistanceFromTerminalAddress(12, 64) -: 4]
-			: isTerminalAddressInRange(13, 0, 8) ? cpu_registers[32 * 31 - 1 - 4 * getDistanceFromTerminalAddress(13, 0) -: 4]
-			: isTerminalAddressInRange(13, 16, 8) ? cpu_registers[32 * 32 - 1 - 4 * getDistanceFromTerminalAddress(13, 16) -: 4]
-
-			: 4'hF;
-	wire [7:0] hexAsciiOutput;
-	HexAsciiConverter hexAsciiConverter (
-		.hex(hexAsciiInput[3:0]),
-		.ascii(hexAsciiOutput[7:0])
-	);
-
-	wire binaryAsciiInput =
-			isTerminalAddressInRange(4, 8, 1) ? cpu_mem_write
-			: 1'b1;
-	wire [7:0] binaryAsciiOutput;
-	BinaryAsciiConverter binaryAsciiConverter (
-		.binary(binaryAsciiInput),
-		.ascii(binaryAsciiOutput[7:0])
-	);
-
 	wire [31:0] disassemblerInput =
-			;
+			nextTerminalAddress >= 170 && nextTerminalAddress < 202 ? cpu_if_instruction
+			: nextTerminalAddress >= 410 && nextTerminalAddress < 442 ? cpu_id_instruction
+			: nextTerminalAddress >= 1210 && nextTerminalAddress < 1242 ? cpu_ex_instruction
+			: nextTerminalAddress >= 1531 && nextTerminalAddress < 1563 ? cpu_mem_instruction
+			: nextTerminalAddress >= 1850 && nextTerminalAddress < 1882 ? cpu_wb_instruction
+			: 32'hFFFFFFFF;
 	wire [32 * 8 - 1 : 0] disassemblerOutput;
 	Disassembler disassembler (
-		.instruction(cpu_instruction[31:0]),
+		.instruction(disassemblerInput[31:0]),
 		.text(disassemblerOutput[32 * 8 - 1 : 0])
 	);
+
+	// XST doesn't accept {cpu_id_registers[32 * 32 - 1 : 31 * 32]}[31 - 4 * (nextTerminalAddress - 560) -: 4]
+	wire [31:0] cpu_id_register0 = cpu_id_registers[1 * 32 - 1 : 0 * 32];
+	wire [31:0] cpu_id_register1 = cpu_id_registers[2 * 32 - 1 : 1 * 32];
+	wire [31:0] cpu_id_register2 = cpu_id_registers[3 * 32 - 1 : 2 * 32];
+	wire [31:0] cpu_id_register3 = cpu_id_registers[4 * 32 - 1 : 3 * 32];
+	wire [31:0] cpu_id_register4 = cpu_id_registers[5 * 32 - 1 : 4 * 32];
+	wire [31:0] cpu_id_register5 = cpu_id_registers[6 * 32 - 1 : 5 * 32];
+	wire [31:0] cpu_id_register6 = cpu_id_registers[7 * 32 - 1 : 6 * 32];
+	wire [31:0] cpu_id_register7 = cpu_id_registers[8 * 32 - 1 : 7 * 32];
+	wire [31:0] cpu_id_register8 = cpu_id_registers[9 * 32 - 1 : 8 * 32];
+	wire [31:0] cpu_id_register9 = cpu_id_registers[10 * 32 - 1 : 9 * 32];
+	wire [31:0] cpu_id_register10 = cpu_id_registers[11 * 32 - 1 : 10 * 32];
+	wire [31:0] cpu_id_register11 = cpu_id_registers[12 * 32 - 1 : 11 * 32];
+	wire [31:0] cpu_id_register12 = cpu_id_registers[13 * 32 - 1 : 12 * 32];
+	wire [31:0] cpu_id_register13 = cpu_id_registers[14 * 32 - 1 : 13 * 32];
+	wire [31:0] cpu_id_register14 = cpu_id_registers[15 * 32 - 1 : 14 * 32];
+	wire [31:0] cpu_id_register15 = cpu_id_registers[16 * 32 - 1 : 15 * 32];
+	wire [31:0] cpu_id_register16 = cpu_id_registers[17 * 32 - 1 : 16 * 32];
+	wire [31:0] cpu_id_register17 = cpu_id_registers[18 * 32 - 1 : 17 * 32];
+	wire [31:0] cpu_id_register18 = cpu_id_registers[19 * 32 - 1 : 18 * 32];
+	wire [31:0] cpu_id_register19 = cpu_id_registers[20 * 32 - 1 : 19 * 32];
+	wire [31:0] cpu_id_register20 = cpu_id_registers[21 * 32 - 1 : 20 * 32];
+	wire [31:0] cpu_id_register21 = cpu_id_registers[22 * 32 - 1 : 21 * 32];
+	wire [31:0] cpu_id_register22 = cpu_id_registers[23 * 32 - 1 : 22 * 32];
+	wire [31:0] cpu_id_register23 = cpu_id_registers[24 * 32 - 1 : 23 * 32];
+	wire [31:0] cpu_id_register24 = cpu_id_registers[25 * 32 - 1 : 24 * 32];
+	wire [31:0] cpu_id_register25 = cpu_id_registers[26 * 32 - 1 : 25 * 32];
+	wire [31:0] cpu_id_register26 = cpu_id_registers[27 * 32 - 1 : 26 * 32];
+	wire [31:0] cpu_id_register27 = cpu_id_registers[28 * 32 - 1 : 27 * 32];
+	wire [31:0] cpu_id_register28 = cpu_id_registers[29 * 32 - 1 : 28 * 32];
+	wire [31:0] cpu_id_register29 = cpu_id_registers[30 * 32 - 1 : 29 * 32];
+	wire [31:0] cpu_id_register30 = cpu_id_registers[31 * 32 - 1 : 30 * 32];
+	wire [31:0] cpu_id_register31 = cpu_id_registers[32 * 32 - 1 : 31 * 32];
+
+	wire [3:0] hexCharacterInput =
+			nextTerminalAddress >= 246 && nextTerminalAddress < 254 ? cpu_if_pc[31 - 4 * (nextTerminalAddress - 246) -: 4]
+			: nextTerminalAddress >= 291 && nextTerminalAddress < 299 ? cpu_if_nextPc[31 - 4 * (nextTerminalAddress - 291) -: 4]
+			: nextTerminalAddress >= 562 && nextTerminalAddress < 570 ? cpu_id_register0[31 - 4 * (nextTerminalAddress - 562) -: 4]
+			: nextTerminalAddress >= 579 && nextTerminalAddress < 587 ? cpu_id_register1[31 - 4 * (nextTerminalAddress - 579) -: 4]
+			: nextTerminalAddress >= 596 && nextTerminalAddress < 604 ? cpu_id_register2[31 - 4 * (nextTerminalAddress - 596) -: 4]
+			: nextTerminalAddress >= 613 && nextTerminalAddress < 621 ? cpu_id_register3[31 - 4 * (nextTerminalAddress - 613) -: 4]
+			: nextTerminalAddress >= 630 && nextTerminalAddress < 638 ? cpu_id_register4[31 - 4 * (nextTerminalAddress - 630) -: 4]
+			: nextTerminalAddress >= 642 && nextTerminalAddress < 650 ? cpu_id_register5[31 - 4 * (nextTerminalAddress - 642) -: 4]
+			: nextTerminalAddress >= 659 && nextTerminalAddress < 667 ? cpu_id_register6[31 - 4 * (nextTerminalAddress - 659) -: 4]
+			: nextTerminalAddress >= 676 && nextTerminalAddress < 684 ? cpu_id_register7[31 - 4 * (nextTerminalAddress - 676) -: 4]
+			: nextTerminalAddress >= 693 && nextTerminalAddress < 701 ? cpu_id_register8[31 - 4 * (nextTerminalAddress - 693) -: 4]
+			: nextTerminalAddress >= 710 && nextTerminalAddress < 718 ? cpu_id_register9[31 - 4 * (nextTerminalAddress - 710) -: 4]
+			: nextTerminalAddress >= 722 && nextTerminalAddress < 730 ? cpu_id_register10[31 - 4 * (nextTerminalAddress - 722) -: 4]
+			: nextTerminalAddress >= 739 && nextTerminalAddress < 747 ? cpu_id_register11[31 - 4 * (nextTerminalAddress - 739) -: 4]
+			: nextTerminalAddress >= 756 && nextTerminalAddress < 764 ? cpu_id_register12[31 - 4 * (nextTerminalAddress - 756) -: 4]
+			: nextTerminalAddress >= 773 && nextTerminalAddress < 781 ? cpu_id_register13[31 - 4 * (nextTerminalAddress - 773) -: 4]
+			: nextTerminalAddress >= 790 && nextTerminalAddress < 798 ? cpu_id_register14[31 - 4 * (nextTerminalAddress - 790) -: 4]
+			: nextTerminalAddress >= 802 && nextTerminalAddress < 810 ? cpu_id_register15[31 - 4 * (nextTerminalAddress - 802) -: 4]
+			: nextTerminalAddress >= 819 && nextTerminalAddress < 827 ? cpu_id_register16[31 - 4 * (nextTerminalAddress - 819) -: 4]
+			: nextTerminalAddress >= 836 && nextTerminalAddress < 844 ? cpu_id_register17[31 - 4 * (nextTerminalAddress - 836) -: 4]
+			: nextTerminalAddress >= 853 && nextTerminalAddress < 861 ? cpu_id_register18[31 - 4 * (nextTerminalAddress - 853) -: 4]
+			: nextTerminalAddress >= 870 && nextTerminalAddress < 878 ? cpu_id_register19[31 - 4 * (nextTerminalAddress - 870) -: 4]
+			: nextTerminalAddress >= 882 && nextTerminalAddress < 890 ? cpu_id_register20[31 - 4 * (nextTerminalAddress - 882) -: 4]
+			: nextTerminalAddress >= 899 && nextTerminalAddress < 907 ? cpu_id_register21[31 - 4 * (nextTerminalAddress - 899) -: 4]
+			: nextTerminalAddress >= 916 && nextTerminalAddress < 924 ? cpu_id_register22[31 - 4 * (nextTerminalAddress - 916) -: 4]
+			: nextTerminalAddress >= 933 && nextTerminalAddress < 941 ? cpu_id_register23[31 - 4 * (nextTerminalAddress - 933) -: 4]
+			: nextTerminalAddress >= 950 && nextTerminalAddress < 958 ? cpu_id_register24[31 - 4 * (nextTerminalAddress - 950) -: 4]
+			: nextTerminalAddress >= 962 && nextTerminalAddress < 970 ? cpu_id_register25[31 - 4 * (nextTerminalAddress - 962) -: 4]
+			: nextTerminalAddress >= 979 && nextTerminalAddress < 987 ? cpu_id_register26[31 - 4 * (nextTerminalAddress - 979) -: 4]
+			: nextTerminalAddress >= 996 && nextTerminalAddress < 1004 ? cpu_id_register27[31 - 4 * (nextTerminalAddress - 996) -: 4]
+			: nextTerminalAddress >= 1013 && nextTerminalAddress < 1021 ? cpu_id_register28[31 - 4 * (nextTerminalAddress - 1013) -: 4]
+			: nextTerminalAddress >= 1030 && nextTerminalAddress < 1038 ? cpu_id_register29[31 - 4 * (nextTerminalAddress - 1030) -: 4]
+			: nextTerminalAddress >= 1042 && nextTerminalAddress < 1050 ? cpu_id_register30[31 - 4 * (nextTerminalAddress - 1042) -: 4]
+			: nextTerminalAddress >= 1059 && nextTerminalAddress < 1067 ? cpu_id_register31[31 - 4 * (nextTerminalAddress - 1059) -: 4]
+			: nextTerminalAddress >= 1295 && nextTerminalAddress < 1303 ? cpu_ex_aluInputA[31 - 4 * (nextTerminalAddress - 1295) -: 4]
+			: nextTerminalAddress >= 1335 && nextTerminalAddress < 1343 ? cpu_ex_aluInputB[31 - 4 * (nextTerminalAddress - 1335) -: 4]
+			: nextTerminalAddress >= 1374 && nextTerminalAddress < 1382 ? cpu_ex_aluOutput[31 - 4 * (nextTerminalAddress - 1374) -: 4]
+			: nextTerminalAddress >= 1618 && nextTerminalAddress < 1626 ? cpu_mem_memoryAddress[31 - 4 * (nextTerminalAddress - 1618) -: 4]
+			: nextTerminalAddress >= 1660 && nextTerminalAddress < 1668 ? cpu_mem_memoryReadData[31 - 4 * (nextTerminalAddress - 1660) -: 4]
+			: nextTerminalAddress >= 1741 && nextTerminalAddress < 1749 ? cpu_mem_memoryWriteData[31 - 4 * (nextTerminalAddress - 1741) -: 4]
+			: nextTerminalAddress >= 1986 && nextTerminalAddress < 1988 ? cpu_wb_registerWriteAddress[7 - 4 * (nextTerminalAddress - 1986) -: 4]
+			: nextTerminalAddress >= 2023 && nextTerminalAddress < 2031 ? cpu_wb_registerWriteData[31 - 4 * (nextTerminalAddress - 2023) -: 4]
+			: 4'hFF;
+	wire [7:0] hexCharacterOutput;
+	HexCharacterConverter hexCharacterConverter (
+		.hex(hexCharacterInput[3:0]),
+		.character(hexCharacterOutput[7:0])
+	);
+
+	wire booleanTextInput =
+			nextTerminalAddress >= 1702 && nextTerminalAddress < 1707 ? cpu_mem_shouldWriteMemory
+			: nextTerminalAddress >= 1944 && nextTerminalAddress < 1949 ? cpu_wb_shouldWriteRegister
+			: 1'b1;
+	wire [5 * 8 - 1 : 0] booleanTextOutput;
+	BooleanTextConverter booleanTextConverter (
+		.boolean(booleanTextInput),
+		.text(booleanTextOutput[5 * 8 - 1 : 0])
+	);
+
+	wire [19199:0] backgroundText = {
+			"Pipelined CPU Debugger                                  Made by Zhang Hai with ",
+			"================================================================================",
+			"IF Stage: nop                                                                   ",
+			"PC: 0xFFFFFFFF                          Next PC: 0xFFFFFFFF                     ",
+			"================================================================================",
+			"ID Stage: nop                                                                   ",
+			"Registers:                                                                      ",
+			"0xFFFFFFFF       0xFFFFFFFF       0xFFFFFFFF       0xFFFFFFFF       0xFFFFFFFF  ",
+			"0xFFFFFFFF       0xFFFFFFFF       0xFFFFFFFF       0xFFFFFFFF       0xFFFFFFFF  ",
+			"0xFFFFFFFF       0xFFFFFFFF       0xFFFFFFFF       0xFFFFFFFF       0xFFFFFFFF  ",
+			"0xFFFFFFFF       0xFFFFFFFF       0xFFFFFFFF       0xFFFFFFFF       0xFFFFFFFF  ",
+			"0xFFFFFFFF       0xFFFFFFFF       0xFFFFFFFF       0xFFFFFFFF       0xFFFFFFFF  ",
+			"0xFFFFFFFF       0xFFFFFFFF       0xFFFFFFFF       0xFFFFFFFF       0xFFFFFFFF  ",
+			"0xFFFFFFFF       0xFFFFFFFF                                                     ",
+			"================================================================================",
+			"EX Stage: nop                                                                   ",
+			"ALU Input A: 0xFFFFFFFF                 ALU Input B: 0xFFFFFFFF                 ",
+			"ALU Output: 0xFFFFFFFF                                                          ",
+			"================================================================================",
+			"MEM Stage: nop                                                                  ",
+			"Memory Address: 0xFFFFFFFF              Memory Read Data: 0xFFFFFFFF            ",
+			"Memory Write Enabled: True              Memory Write Data: 0xFFFFFFFF           ",
+			"================================================================================",
+			"WB Stage: nop                                                                   ",
+			"Register Write Enabled: True            Register Write Address: 0xAA            ",
+			"Register Write Data: 0xFFFFFFFF                                                 ",
+			"                                                                                ",
+			"                                                                                ",
+			"                                                                                ",
+			"                                                                                "
+	};
 
 	always @(posedge clock) begin
 
 		terminalAddress <= nextTerminalAddress;
 
 		terminalWriteData <=
-				isTerminalAddressInRange(0, 0, 25) ? {"Zhang Hai's Pipelined CPU"}[8 * getDistanceFromTerminalAddress(0, 0) +: 8]
-
-				: isTerminalAddressInRange(1, 0, 80) ? "="
-
-				: isTerminalAddressInRange(3, 0, 9) ? {"IF Stage:"}[8 * getDistanceFromTerminalAddress(3, 0) +: 8]
-				// FIXME
-				: isTerminalAddressInRange(3, 10, 32) ? disassemblerOutput[8 * getDistanceFromTerminalAddress(3, 10) +: 8]
-				: isTerminalAddressInRange(4, 0, 3) ? {"PC:"}[8 * getDistanceFromTerminalAddress(4, 0) +: 8]
-				: isTerminalAddressInRange(4, 4, 8) ? hexAsciiOutput
-				: isTerminalAddressInRange(4, 40, 8) ? {"Next PC:"}[8 * getDistanceFromTerminalAddress(4, 40) +: 8]
-				: isTerminalAddressInRange(4, 49, 8) ? hexAsciiOutput
-
-				: isTerminalAddressInRange(1, 0, 5) ? INST_PROMPT[8 * getDistanceFromTerminalAddress(1, 0) +: 8]
-				: isTerminalAddressInRange(1, 8, 8) ? hexAsciiOutput
-
-				: isTerminalAddressInRange(2, 0, 6) ? MEM_ADDR_PROMPT[8 * getDistanceFromTerminalAddress(2, 0) +: 8]
-				: isTerminalAddressInRange(2, 8, 8) ? hexAsciiOutput
-
-				: isTerminalAddressInRange(3, 0, 7) ? MEM_READ_DATA_PROMPT[8 * getDistanceFromTerminalAddress(3, 0) +: 8]
-				: isTerminalAddressInRange(3, 8, 8) ? hexAsciiOutput
-
-				: isTerminalAddressInRange(4, 0, 7) ? MEM_WRITE_PROMPT[8 * getDistanceFromTerminalAddress(4, 0) +: 8]
-				: isTerminalAddressInRange(4, 8, 1) ? binaryAsciiOutput
-
-				: isTerminalAddressInRange(5, 0, 7) ? MEM_WRITE_DATA_PROMPT[8 * getDistanceFromTerminalAddress(5, 0) +: 8]
-				: isTerminalAddressInRange(5, 8, 8) ? hexAsciiOutput
-
-				: isTerminalAddressInRange(6, 0, 5) ? REGS_PROMPT[8 * getDistanceFromTerminalAddress(6, 0) +: 8]
-
-				: isTerminalAddressInRange(7, 0, 8) ? hexAsciiOutput
-				: isTerminalAddressInRange(7, 16, 8) ? hexAsciiOutput
-				: isTerminalAddressInRange(7, 32, 8) ? hexAsciiOutput
-				: isTerminalAddressInRange(7, 48, 8) ? hexAsciiOutput
-				: isTerminalAddressInRange(7, 64, 8) ? hexAsciiOutput
-				: isTerminalAddressInRange(8, 0, 8) ? hexAsciiOutput
-				: isTerminalAddressInRange(8, 16, 8) ? hexAsciiOutput
-				: isTerminalAddressInRange(8, 32, 8) ? hexAsciiOutput
-				: isTerminalAddressInRange(8, 48, 8) ? hexAsciiOutput
-				: isTerminalAddressInRange(8, 64, 8) ? hexAsciiOutput
-				: isTerminalAddressInRange(9, 0, 8) ? hexAsciiOutput
-				: isTerminalAddressInRange(9, 16, 8) ? hexAsciiOutput
-				: isTerminalAddressInRange(9, 32, 8) ? hexAsciiOutput
-				: isTerminalAddressInRange(9, 48, 8) ? hexAsciiOutput
-				: isTerminalAddressInRange(9, 64, 8) ? hexAsciiOutput
-				: isTerminalAddressInRange(10, 0, 8) ? hexAsciiOutput
-				: isTerminalAddressInRange(10, 16, 8) ? hexAsciiOutput
-				: isTerminalAddressInRange(10, 32, 8) ? hexAsciiOutput
-				: isTerminalAddressInRange(10, 48, 8) ? hexAsciiOutput
-				: isTerminalAddressInRange(10, 64, 8) ? hexAsciiOutput
-				: isTerminalAddressInRange(11, 0, 8) ? hexAsciiOutput
-				: isTerminalAddressInRange(11, 16, 8) ? hexAsciiOutput
-				: isTerminalAddressInRange(11, 32, 8) ? hexAsciiOutput
-				: isTerminalAddressInRange(11, 48, 8) ? hexAsciiOutput
-				: isTerminalAddressInRange(11, 64, 8) ? hexAsciiOutput
-				: isTerminalAddressInRange(12, 0, 8) ? hexAsciiOutput
-				: isTerminalAddressInRange(12, 16, 8) ? hexAsciiOutput
-				: isTerminalAddressInRange(12, 32, 8) ? hexAsciiOutput
-				: isTerminalAddressInRange(12, 48, 8) ? hexAsciiOutput
-				: isTerminalAddressInRange(12, 64, 8) ? hexAsciiOutput
-				: isTerminalAddressInRange(13, 0, 8) ? hexAsciiOutput
-				: isTerminalAddressInRange(13, 16, 8) ? hexAsciiOutput
-
-				: isTerminalAddressInRange(15, 0, 32) ? disassemblerOutput[32 * 8 - 1 - 8 * getDistanceFromTerminalAddress(15, 0) -: 8]
-
-				: 8'b0;
+				nextTerminalAddress >= 170 && nextTerminalAddress < 202 ? disassemblerOutput[255 - 8 * (nextTerminalAddress - 170) -: 8]
+				: nextTerminalAddress >= 246 && nextTerminalAddress < 254 ? hexCharacterOutput[63 - 8 * (nextTerminalAddress - 246) -: 8]
+				: nextTerminalAddress >= 291 && nextTerminalAddress < 299 ? hexCharacterOutput[63 - 8 * (nextTerminalAddress - 291) -: 8]
+				: nextTerminalAddress >= 410 && nextTerminalAddress < 442 ? disassemblerOutput[255 - 8 * (nextTerminalAddress - 410) -: 8]
+				: nextTerminalAddress >= 562 && nextTerminalAddress < 570 ? hexCharacterOutput[63 - 8 * (nextTerminalAddress - 562) -: 8]
+				: nextTerminalAddress >= 579 && nextTerminalAddress < 587 ? hexCharacterOutput[63 - 8 * (nextTerminalAddress - 579) -: 8]
+				: nextTerminalAddress >= 596 && nextTerminalAddress < 604 ? hexCharacterOutput[63 - 8 * (nextTerminalAddress - 596) -: 8]
+				: nextTerminalAddress >= 613 && nextTerminalAddress < 621 ? hexCharacterOutput[63 - 8 * (nextTerminalAddress - 613) -: 8]
+				: nextTerminalAddress >= 630 && nextTerminalAddress < 638 ? hexCharacterOutput[63 - 8 * (nextTerminalAddress - 630) -: 8]
+				: nextTerminalAddress >= 642 && nextTerminalAddress < 650 ? hexCharacterOutput[63 - 8 * (nextTerminalAddress - 642) -: 8]
+				: nextTerminalAddress >= 659 && nextTerminalAddress < 667 ? hexCharacterOutput[63 - 8 * (nextTerminalAddress - 659) -: 8]
+				: nextTerminalAddress >= 676 && nextTerminalAddress < 684 ? hexCharacterOutput[63 - 8 * (nextTerminalAddress - 676) -: 8]
+				: nextTerminalAddress >= 693 && nextTerminalAddress < 701 ? hexCharacterOutput[63 - 8 * (nextTerminalAddress - 693) -: 8]
+				: nextTerminalAddress >= 710 && nextTerminalAddress < 718 ? hexCharacterOutput[63 - 8 * (nextTerminalAddress - 710) -: 8]
+				: nextTerminalAddress >= 722 && nextTerminalAddress < 730 ? hexCharacterOutput[63 - 8 * (nextTerminalAddress - 722) -: 8]
+				: nextTerminalAddress >= 739 && nextTerminalAddress < 747 ? hexCharacterOutput[63 - 8 * (nextTerminalAddress - 739) -: 8]
+				: nextTerminalAddress >= 756 && nextTerminalAddress < 764 ? hexCharacterOutput[63 - 8 * (nextTerminalAddress - 756) -: 8]
+				: nextTerminalAddress >= 773 && nextTerminalAddress < 781 ? hexCharacterOutput[63 - 8 * (nextTerminalAddress - 773) -: 8]
+				: nextTerminalAddress >= 790 && nextTerminalAddress < 798 ? hexCharacterOutput[63 - 8 * (nextTerminalAddress - 790) -: 8]
+				: nextTerminalAddress >= 802 && nextTerminalAddress < 810 ? hexCharacterOutput[63 - 8 * (nextTerminalAddress - 802) -: 8]
+				: nextTerminalAddress >= 819 && nextTerminalAddress < 827 ? hexCharacterOutput[63 - 8 * (nextTerminalAddress - 819) -: 8]
+				: nextTerminalAddress >= 836 && nextTerminalAddress < 844 ? hexCharacterOutput[63 - 8 * (nextTerminalAddress - 836) -: 8]
+				: nextTerminalAddress >= 853 && nextTerminalAddress < 861 ? hexCharacterOutput[63 - 8 * (nextTerminalAddress - 853) -: 8]
+				: nextTerminalAddress >= 870 && nextTerminalAddress < 878 ? hexCharacterOutput[63 - 8 * (nextTerminalAddress - 870) -: 8]
+				: nextTerminalAddress >= 882 && nextTerminalAddress < 890 ? hexCharacterOutput[63 - 8 * (nextTerminalAddress - 882) -: 8]
+				: nextTerminalAddress >= 899 && nextTerminalAddress < 907 ? hexCharacterOutput[63 - 8 * (nextTerminalAddress - 899) -: 8]
+				: nextTerminalAddress >= 916 && nextTerminalAddress < 924 ? hexCharacterOutput[63 - 8 * (nextTerminalAddress - 916) -: 8]
+				: nextTerminalAddress >= 933 && nextTerminalAddress < 941 ? hexCharacterOutput[63 - 8 * (nextTerminalAddress - 933) -: 8]
+				: nextTerminalAddress >= 950 && nextTerminalAddress < 958 ? hexCharacterOutput[63 - 8 * (nextTerminalAddress - 950) -: 8]
+				: nextTerminalAddress >= 962 && nextTerminalAddress < 970 ? hexCharacterOutput[63 - 8 * (nextTerminalAddress - 962) -: 8]
+				: nextTerminalAddress >= 979 && nextTerminalAddress < 987 ? hexCharacterOutput[63 - 8 * (nextTerminalAddress - 979) -: 8]
+				: nextTerminalAddress >= 996 && nextTerminalAddress < 1004 ? hexCharacterOutput[63 - 8 * (nextTerminalAddress - 996) -: 8]
+				: nextTerminalAddress >= 1013 && nextTerminalAddress < 1021 ? hexCharacterOutput[63 - 8 * (nextTerminalAddress - 1013) -: 8]
+				: nextTerminalAddress >= 1030 && nextTerminalAddress < 1038 ? hexCharacterOutput[63 - 8 * (nextTerminalAddress - 1030) -: 8]
+				: nextTerminalAddress >= 1042 && nextTerminalAddress < 1050 ? hexCharacterOutput[63 - 8 * (nextTerminalAddress - 1042) -: 8]
+				: nextTerminalAddress >= 1059 && nextTerminalAddress < 1067 ? hexCharacterOutput[63 - 8 * (nextTerminalAddress - 1059) -: 8]
+				: nextTerminalAddress >= 1210 && nextTerminalAddress < 1242 ? disassemblerOutput[255 - 8 * (nextTerminalAddress - 1210) -: 8]
+				: nextTerminalAddress >= 1295 && nextTerminalAddress < 1303 ? hexCharacterOutput[63 - 8 * (nextTerminalAddress - 1295) -: 8]
+				: nextTerminalAddress >= 1335 && nextTerminalAddress < 1343 ? hexCharacterOutput[63 - 8 * (nextTerminalAddress - 1335) -: 8]
+				: nextTerminalAddress >= 1374 && nextTerminalAddress < 1382 ? hexCharacterOutput[63 - 8 * (nextTerminalAddress - 1374) -: 8]
+				: nextTerminalAddress >= 1531 && nextTerminalAddress < 1563 ? disassemblerOutput[255 - 8 * (nextTerminalAddress - 1531) -: 8]
+				: nextTerminalAddress >= 1618 && nextTerminalAddress < 1626 ? hexCharacterOutput[63 - 8 * (nextTerminalAddress - 1618) -: 8]
+				: nextTerminalAddress >= 1660 && nextTerminalAddress < 1668 ? hexCharacterOutput[63 - 8 * (nextTerminalAddress - 1660) -: 8]
+				: nextTerminalAddress >= 1702 && nextTerminalAddress < 1707 ? booleanTextOutput[39 - 8 * (nextTerminalAddress - 1702) -: 8]
+				: nextTerminalAddress >= 1741 && nextTerminalAddress < 1749 ? hexCharacterOutput[63 - 8 * (nextTerminalAddress - 1741) -: 8]
+				: nextTerminalAddress >= 1850 && nextTerminalAddress < 1882 ? disassemblerOutput[255 - 8 * (nextTerminalAddress - 1850) -: 8]
+				: nextTerminalAddress >= 1944 && nextTerminalAddress < 1949 ? booleanTextOutput[39 - 8 * (nextTerminalAddress - 1944) -: 8]
+				: nextTerminalAddress >= 1986 && nextTerminalAddress < 1988 ? hexCharacterOutput[15 - 8 * (nextTerminalAddress - 1986) -: 8]
+				: nextTerminalAddress >= 2023 && nextTerminalAddress < 2031 ? hexCharacterOutput[63 - 8 * (nextTerminalAddress - 2023) -: 8]
+				: backgroundText[19199 - 8 * nextTerminalAddress -: 8];
 	end
 endmodule
