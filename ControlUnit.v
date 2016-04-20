@@ -119,7 +119,24 @@ module ControlUnit (
 			|| code == `CODE_SLTI
 			|| code == `CODE_SLTIU;
 	assign shouldWriteRegister =
-			(isRType && !isJumpRegister)
+			(isRType && (
+				function_ == `FUNCTION_ADD
+				|| function_ == `FUNCTION_ADDU
+				|| function_ == `FUNCTION_SUB
+				|| function_ == `FUNCTION_SUBU
+				|| function_ == `FUNCTION_AND
+				|| function_ == `FUNCTION_OR
+				|| function_ == `FUNCTION_XOR
+				|| function_ == `FUNCTION_NOR
+				|| function_ == `FUNCTION_SLT
+				|| function_ == `FUNCTION_SLTU
+				|| function_ == `FUNCTION_SLL
+				|| function_ == `FUNCTION_SRL
+				|| function_ == `FUNCTION_SRA
+				|| function_ == `FUNCTION_SLLV
+				|| function_ == `FUNCTION_SRLV
+				|| function_ == `FUNCTION_SRAV
+			))
 			|| shouldWriteToRegisterRtElseRd
 			|| isJumpAndLink;
 	assign shouldWriteMemoryElseAluOutputToRegister = code == `CODE_LW;
