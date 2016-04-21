@@ -81,6 +81,7 @@ module Debugger (
 	wire [31:0] cpu_id_register30 = cpu_id_registers[31 * 32 - 1 : 30 * 32];
 	wire [31:0] cpu_id_register31 = cpu_id_registers[32 * 32 - 1 : 31 * 32];
 
+	// FIXME: XST inferred these indexed part-select as shifters instead of multiplexers.
 	wire [3:0] hexCharacterInput =
 			nextTerminalAddress >= 246 && nextTerminalAddress < 254 ? cpu_if_pc[31 - 4 * (nextTerminalAddress - 246) -: 4]
 			: nextTerminalAddress >= 291 && nextTerminalAddress < 299 ? cpu_if_nextPc[31 - 4 * (nextTerminalAddress - 291) -: 4]
