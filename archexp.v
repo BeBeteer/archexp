@@ -27,6 +27,9 @@ module archexp(
 	wire [31:0] cpu_if_nextPc;
 	wire [31:0] cpu_if_instruction;
 	wire [31:0] cpu_id_instruction;
+	wire cpu_id_shouldStall;
+	wire cpu_id_shouldForwardRegisterRs;
+	wire cpu_id_shouldForwardRegisterRt;
 	wire [32 * 32 - 1 : 0] cpu_id_registers;
 	wire [31:0] cpu_ex_instruction;
 	wire [31:0] cpu_ex_aluInputA;
@@ -78,6 +81,9 @@ module archexp(
 		.debug_if_nextPc(cpu_if_nextPc[31:0]),
 		.debug_if_instruction(cpu_if_instruction[31:0]),
 		.debug_id_instruction(cpu_id_instruction[31:0]),
+		.debug_id_shouldStall(cpu_id_shouldStall),
+		.debug_id_shouldForwardRegisterRs(cpu_id_shouldForwardRegisterRs),
+		.debug_id_shouldForwardRegisterRt(cpu_id_shouldForwardRegisterRt),
 		.debug_id_registers(cpu_id_registers[32 * 32 - 1 : 0]),
 		.debug_ex_instruction(cpu_ex_instruction[31:0]),
 		.debug_ex_aluInputA(cpu_ex_aluInputA[31:0]),
@@ -131,6 +137,9 @@ module archexp(
 		.cpu_if_nextPc(cpu_if_nextPc[31:0]),
 		.cpu_if_instruction(cpu_if_instruction[31:0]),
 		.cpu_id_instruction(cpu_id_instruction[31:0]),
+		.cpu_id_shouldStall(cpu_id_shouldStall),
+		.cpu_id_shouldForwardRegisterRs(cpu_id_shouldForwardRegisterRs),
+		.cpu_id_shouldForwardRegisterRt(cpu_id_shouldForwardRegisterRt),
 		.cpu_id_registers(cpu_id_registers[32 * 32 - 1 : 0]),
 		.cpu_ex_instruction(cpu_ex_instruction[31:0]),
 		.cpu_ex_aluInputA(cpu_ex_aluInputA[31:0]),

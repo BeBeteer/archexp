@@ -43,6 +43,8 @@ module IdStage (
 		input [31:0] mem_memoryData,
 		output shouldStall,	// WPCIR
 
+		output debug_shouldForwardRegisterRs,
+		output debug_shouldForwardRegisterRt,
 		output [32 * 32 - 1 : 0] debug_registers
 	);
 
@@ -141,6 +143,8 @@ module IdStage (
 			: shouldForwardRegisterRtWithMemStageAluOutput ? mem_aluOutput
 			: shouldForwardRegisterRtWithMemStageMemoryData ? mem_memoryData
 			: localRegisterRt;
+	assign debug_shouldForwardRegisterRs = shouldForwardRegisterRsWithExStageAluOutput || shouldForwardRegisterRsWithMemStageAluOutput || shouldForwardRegisterRsWithMemStageMemoryData;
+	assign debug_shouldForwardRegisterRt = shouldForwardRegisterRtWithExStageAluOutput || shouldForwardRegisterRtWithMemStageAluOutput || shouldForwardRegisterRtWithMemStageMemoryData;
 
 	assign registerRsOrPc_4 = isJumpAndLink ? pc_4 : registerRs;
 	assign registerRtOrZero = isJumpAndLink ? 32'b0 : registerRt;

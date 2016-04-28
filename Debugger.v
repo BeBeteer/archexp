@@ -8,6 +8,9 @@ module Debugger (
 		input [31:0] cpu_if_nextPc,
 		input [31:0] cpu_if_instruction,
 		input [31:0] cpu_id_instruction,
+		input cpu_id_shouldStall,
+		input cpu_id_shouldForwardRegisterRs,
+		input cpu_id_shouldForwardRegisterRt,
 		input [32 * 32 - 1 : 0] cpu_id_registers,
 		input [31:0] cpu_ex_instruction,
 		input [31:0] cpu_ex_aluInputA,
@@ -37,9 +40,9 @@ module Debugger (
 	wire [31:0] disassemblerInput =
 			nextTerminalAddress >= 170 && nextTerminalAddress < 202 ? cpu_if_instruction
 			: nextTerminalAddress >= 410 && nextTerminalAddress < 442 ? cpu_id_instruction
-			: nextTerminalAddress >= 1210 && nextTerminalAddress < 1242 ? cpu_ex_instruction
-			: nextTerminalAddress >= 1531 && nextTerminalAddress < 1563 ? cpu_mem_instruction
-			: nextTerminalAddress >= 1850 && nextTerminalAddress < 1882 ? cpu_wb_instruction
+			: nextTerminalAddress >= 1370 && nextTerminalAddress < 1402 ? cpu_ex_instruction
+			: nextTerminalAddress >= 1691 && nextTerminalAddress < 1723 ? cpu_mem_instruction
+			: nextTerminalAddress >= 2010 && nextTerminalAddress < 2042 ? cpu_wb_instruction
 			: 32'hFFFFFFFF;
 	wire [32 * 8 - 1 : 0] disassemblerOutput;
 	Disassembler disassembler (
@@ -85,46 +88,46 @@ module Debugger (
 	wire [3:0] hexCharacterInput =
 			nextTerminalAddress >= 246 && nextTerminalAddress < 254 ? cpu_if_pc[31 - 4 * (nextTerminalAddress - 246) -: 4]
 			: nextTerminalAddress >= 291 && nextTerminalAddress < 299 ? cpu_if_nextPc[31 - 4 * (nextTerminalAddress - 291) -: 4]
-			: nextTerminalAddress >= 562 && nextTerminalAddress < 570 ? cpu_id_register0[31 - 4 * (nextTerminalAddress - 562) -: 4]
-			: nextTerminalAddress >= 579 && nextTerminalAddress < 587 ? cpu_id_register1[31 - 4 * (nextTerminalAddress - 579) -: 4]
-			: nextTerminalAddress >= 596 && nextTerminalAddress < 604 ? cpu_id_register2[31 - 4 * (nextTerminalAddress - 596) -: 4]
-			: nextTerminalAddress >= 613 && nextTerminalAddress < 621 ? cpu_id_register3[31 - 4 * (nextTerminalAddress - 613) -: 4]
-			: nextTerminalAddress >= 630 && nextTerminalAddress < 638 ? cpu_id_register4[31 - 4 * (nextTerminalAddress - 630) -: 4]
-			: nextTerminalAddress >= 642 && nextTerminalAddress < 650 ? cpu_id_register5[31 - 4 * (nextTerminalAddress - 642) -: 4]
-			: nextTerminalAddress >= 659 && nextTerminalAddress < 667 ? cpu_id_register6[31 - 4 * (nextTerminalAddress - 659) -: 4]
-			: nextTerminalAddress >= 676 && nextTerminalAddress < 684 ? cpu_id_register7[31 - 4 * (nextTerminalAddress - 676) -: 4]
-			: nextTerminalAddress >= 693 && nextTerminalAddress < 701 ? cpu_id_register8[31 - 4 * (nextTerminalAddress - 693) -: 4]
-			: nextTerminalAddress >= 710 && nextTerminalAddress < 718 ? cpu_id_register9[31 - 4 * (nextTerminalAddress - 710) -: 4]
-			: nextTerminalAddress >= 722 && nextTerminalAddress < 730 ? cpu_id_register10[31 - 4 * (nextTerminalAddress - 722) -: 4]
-			: nextTerminalAddress >= 739 && nextTerminalAddress < 747 ? cpu_id_register11[31 - 4 * (nextTerminalAddress - 739) -: 4]
-			: nextTerminalAddress >= 756 && nextTerminalAddress < 764 ? cpu_id_register12[31 - 4 * (nextTerminalAddress - 756) -: 4]
-			: nextTerminalAddress >= 773 && nextTerminalAddress < 781 ? cpu_id_register13[31 - 4 * (nextTerminalAddress - 773) -: 4]
-			: nextTerminalAddress >= 790 && nextTerminalAddress < 798 ? cpu_id_register14[31 - 4 * (nextTerminalAddress - 790) -: 4]
-			: nextTerminalAddress >= 802 && nextTerminalAddress < 810 ? cpu_id_register15[31 - 4 * (nextTerminalAddress - 802) -: 4]
-			: nextTerminalAddress >= 819 && nextTerminalAddress < 827 ? cpu_id_register16[31 - 4 * (nextTerminalAddress - 819) -: 4]
-			: nextTerminalAddress >= 836 && nextTerminalAddress < 844 ? cpu_id_register17[31 - 4 * (nextTerminalAddress - 836) -: 4]
-			: nextTerminalAddress >= 853 && nextTerminalAddress < 861 ? cpu_id_register18[31 - 4 * (nextTerminalAddress - 853) -: 4]
-			: nextTerminalAddress >= 870 && nextTerminalAddress < 878 ? cpu_id_register19[31 - 4 * (nextTerminalAddress - 870) -: 4]
-			: nextTerminalAddress >= 882 && nextTerminalAddress < 890 ? cpu_id_register20[31 - 4 * (nextTerminalAddress - 882) -: 4]
-			: nextTerminalAddress >= 899 && nextTerminalAddress < 907 ? cpu_id_register21[31 - 4 * (nextTerminalAddress - 899) -: 4]
-			: nextTerminalAddress >= 916 && nextTerminalAddress < 924 ? cpu_id_register22[31 - 4 * (nextTerminalAddress - 916) -: 4]
-			: nextTerminalAddress >= 933 && nextTerminalAddress < 941 ? cpu_id_register23[31 - 4 * (nextTerminalAddress - 933) -: 4]
-			: nextTerminalAddress >= 950 && nextTerminalAddress < 958 ? cpu_id_register24[31 - 4 * (nextTerminalAddress - 950) -: 4]
-			: nextTerminalAddress >= 962 && nextTerminalAddress < 970 ? cpu_id_register25[31 - 4 * (nextTerminalAddress - 962) -: 4]
-			: nextTerminalAddress >= 979 && nextTerminalAddress < 987 ? cpu_id_register26[31 - 4 * (nextTerminalAddress - 979) -: 4]
-			: nextTerminalAddress >= 996 && nextTerminalAddress < 1004 ? cpu_id_register27[31 - 4 * (nextTerminalAddress - 996) -: 4]
-			: nextTerminalAddress >= 1013 && nextTerminalAddress < 1021 ? cpu_id_register28[31 - 4 * (nextTerminalAddress - 1013) -: 4]
-			: nextTerminalAddress >= 1030 && nextTerminalAddress < 1038 ? cpu_id_register29[31 - 4 * (nextTerminalAddress - 1030) -: 4]
-			: nextTerminalAddress >= 1042 && nextTerminalAddress < 1050 ? cpu_id_register30[31 - 4 * (nextTerminalAddress - 1042) -: 4]
-			: nextTerminalAddress >= 1059 && nextTerminalAddress < 1067 ? cpu_id_register31[31 - 4 * (nextTerminalAddress - 1059) -: 4]
-			: nextTerminalAddress >= 1295 && nextTerminalAddress < 1303 ? cpu_ex_aluInputA[31 - 4 * (nextTerminalAddress - 1295) -: 4]
-			: nextTerminalAddress >= 1335 && nextTerminalAddress < 1343 ? cpu_ex_aluInputB[31 - 4 * (nextTerminalAddress - 1335) -: 4]
-			: nextTerminalAddress >= 1374 && nextTerminalAddress < 1382 ? cpu_ex_aluOutput[31 - 4 * (nextTerminalAddress - 1374) -: 4]
-			: nextTerminalAddress >= 1618 && nextTerminalAddress < 1626 ? cpu_mem_memoryAddress[31 - 4 * (nextTerminalAddress - 1618) -: 4]
-			: nextTerminalAddress >= 1660 && nextTerminalAddress < 1668 ? cpu_mem_memoryReadData[31 - 4 * (nextTerminalAddress - 1660) -: 4]
-			: nextTerminalAddress >= 1741 && nextTerminalAddress < 1749 ? cpu_mem_memoryWriteData[31 - 4 * (nextTerminalAddress - 1741) -: 4]
-			: nextTerminalAddress >= 1986 && nextTerminalAddress < 1988 ? cpu_wb_registerWriteAddress[7 - 4 * (nextTerminalAddress - 1986) -: 4]
-			: nextTerminalAddress >= 2023 && nextTerminalAddress < 2031 ? cpu_wb_registerWriteData[31 - 4 * (nextTerminalAddress - 2023) -: 4]
+			: nextTerminalAddress >= 722 && nextTerminalAddress < 730 ? cpu_id_register0[31 - 4 * (nextTerminalAddress - 722) -: 4]
+			: nextTerminalAddress >= 739 && nextTerminalAddress < 747 ? cpu_id_register1[31 - 4 * (nextTerminalAddress - 739) -: 4]
+			: nextTerminalAddress >= 756 && nextTerminalAddress < 764 ? cpu_id_register2[31 - 4 * (nextTerminalAddress - 756) -: 4]
+			: nextTerminalAddress >= 773 && nextTerminalAddress < 781 ? cpu_id_register3[31 - 4 * (nextTerminalAddress - 773) -: 4]
+			: nextTerminalAddress >= 790 && nextTerminalAddress < 798 ? cpu_id_register4[31 - 4 * (nextTerminalAddress - 790) -: 4]
+			: nextTerminalAddress >= 802 && nextTerminalAddress < 810 ? cpu_id_register5[31 - 4 * (nextTerminalAddress - 802) -: 4]
+			: nextTerminalAddress >= 819 && nextTerminalAddress < 827 ? cpu_id_register6[31 - 4 * (nextTerminalAddress - 819) -: 4]
+			: nextTerminalAddress >= 836 && nextTerminalAddress < 844 ? cpu_id_register7[31 - 4 * (nextTerminalAddress - 836) -: 4]
+			: nextTerminalAddress >= 853 && nextTerminalAddress < 861 ? cpu_id_register8[31 - 4 * (nextTerminalAddress - 853) -: 4]
+			: nextTerminalAddress >= 870 && nextTerminalAddress < 878 ? cpu_id_register9[31 - 4 * (nextTerminalAddress - 870) -: 4]
+			: nextTerminalAddress >= 882 && nextTerminalAddress < 890 ? cpu_id_register10[31 - 4 * (nextTerminalAddress - 882) -: 4]
+			: nextTerminalAddress >= 899 && nextTerminalAddress < 907 ? cpu_id_register11[31 - 4 * (nextTerminalAddress - 899) -: 4]
+			: nextTerminalAddress >= 916 && nextTerminalAddress < 924 ? cpu_id_register12[31 - 4 * (nextTerminalAddress - 916) -: 4]
+			: nextTerminalAddress >= 933 && nextTerminalAddress < 941 ? cpu_id_register13[31 - 4 * (nextTerminalAddress - 933) -: 4]
+			: nextTerminalAddress >= 950 && nextTerminalAddress < 958 ? cpu_id_register14[31 - 4 * (nextTerminalAddress - 950) -: 4]
+			: nextTerminalAddress >= 962 && nextTerminalAddress < 970 ? cpu_id_register15[31 - 4 * (nextTerminalAddress - 962) -: 4]
+			: nextTerminalAddress >= 979 && nextTerminalAddress < 987 ? cpu_id_register16[31 - 4 * (nextTerminalAddress - 979) -: 4]
+			: nextTerminalAddress >= 996 && nextTerminalAddress < 1004 ? cpu_id_register17[31 - 4 * (nextTerminalAddress - 996) -: 4]
+			: nextTerminalAddress >= 1013 && nextTerminalAddress < 1021 ? cpu_id_register18[31 - 4 * (nextTerminalAddress - 1013) -: 4]
+			: nextTerminalAddress >= 1030 && nextTerminalAddress < 1038 ? cpu_id_register19[31 - 4 * (nextTerminalAddress - 1030) -: 4]
+			: nextTerminalAddress >= 1042 && nextTerminalAddress < 1050 ? cpu_id_register20[31 - 4 * (nextTerminalAddress - 1042) -: 4]
+			: nextTerminalAddress >= 1059 && nextTerminalAddress < 1067 ? cpu_id_register21[31 - 4 * (nextTerminalAddress - 1059) -: 4]
+			: nextTerminalAddress >= 1076 && nextTerminalAddress < 1084 ? cpu_id_register22[31 - 4 * (nextTerminalAddress - 1076) -: 4]
+			: nextTerminalAddress >= 1093 && nextTerminalAddress < 1101 ? cpu_id_register23[31 - 4 * (nextTerminalAddress - 1093) -: 4]
+			: nextTerminalAddress >= 1110 && nextTerminalAddress < 1118 ? cpu_id_register24[31 - 4 * (nextTerminalAddress - 1110) -: 4]
+			: nextTerminalAddress >= 1122 && nextTerminalAddress < 1130 ? cpu_id_register25[31 - 4 * (nextTerminalAddress - 1122) -: 4]
+			: nextTerminalAddress >= 1139 && nextTerminalAddress < 1147 ? cpu_id_register26[31 - 4 * (nextTerminalAddress - 1139) -: 4]
+			: nextTerminalAddress >= 1156 && nextTerminalAddress < 1164 ? cpu_id_register27[31 - 4 * (nextTerminalAddress - 1156) -: 4]
+			: nextTerminalAddress >= 1173 && nextTerminalAddress < 1181 ? cpu_id_register28[31 - 4 * (nextTerminalAddress - 1173) -: 4]
+			: nextTerminalAddress >= 1190 && nextTerminalAddress < 1198 ? cpu_id_register29[31 - 4 * (nextTerminalAddress - 1190) -: 4]
+			: nextTerminalAddress >= 1202 && nextTerminalAddress < 1210 ? cpu_id_register30[31 - 4 * (nextTerminalAddress - 1202) -: 4]
+			: nextTerminalAddress >= 1219 && nextTerminalAddress < 1227 ? cpu_id_register31[31 - 4 * (nextTerminalAddress - 1219) -: 4]
+			: nextTerminalAddress >= 1455 && nextTerminalAddress < 1463 ? cpu_ex_aluInputA[31 - 4 * (nextTerminalAddress - 1455) -: 4]
+			: nextTerminalAddress >= 1495 && nextTerminalAddress < 1503 ? cpu_ex_aluInputB[31 - 4 * (nextTerminalAddress - 1495) -: 4]
+			: nextTerminalAddress >= 1534 && nextTerminalAddress < 1542 ? cpu_ex_aluOutput[31 - 4 * (nextTerminalAddress - 1534) -: 4]
+			: nextTerminalAddress >= 1778 && nextTerminalAddress < 1786 ? cpu_mem_memoryAddress[31 - 4 * (nextTerminalAddress - 1778) -: 4]
+			: nextTerminalAddress >= 1820 && nextTerminalAddress < 1828 ? cpu_mem_memoryReadData[31 - 4 * (nextTerminalAddress - 1820) -: 4]
+			: nextTerminalAddress >= 1901 && nextTerminalAddress < 1909 ? cpu_mem_memoryWriteData[31 - 4 * (nextTerminalAddress - 1901) -: 4]
+			: nextTerminalAddress >= 2146 && nextTerminalAddress < 2148 ? cpu_wb_registerWriteAddress[7 - 4 * (nextTerminalAddress - 2146) -: 4]
+			: nextTerminalAddress >= 2183 && nextTerminalAddress < 2191 ? cpu_wb_registerWriteData[31 - 4 * (nextTerminalAddress - 2183) -: 4]
 			: 4'hF;
 	wire [7:0] hexCharacterOutput;
 	HexCharacterConverter hexCharacterConverter (
@@ -133,8 +136,11 @@ module Debugger (
 	);
 
 	wire booleanTextInput =
-			nextTerminalAddress >= 1702 && nextTerminalAddress < 1707 ? cpu_mem_shouldWriteMemory
-			: nextTerminalAddress >= 1944 && nextTerminalAddress < 1949 ? cpu_wb_shouldWriteRegister
+			nextTerminalAddress >= 487 && nextTerminalAddress < 492 ? cpu_id_shouldStall
+			: nextTerminalAddress >= 572 && nextTerminalAddress < 577 ? cpu_id_shouldForwardRegisterRs
+			: nextTerminalAddress >= 612 && nextTerminalAddress < 617 ? cpu_id_shouldForwardRegisterRt
+			: nextTerminalAddress >= 1862 && nextTerminalAddress < 1867 ? cpu_mem_shouldWriteMemory
+			: nextTerminalAddress >= 2104 && nextTerminalAddress < 2109 ? cpu_wb_shouldWriteRegister
 			: 1'b1;
 	wire [5 * 8 - 1 : 0] booleanTextOutput;
 	BooleanTextConverter booleanTextConverter (
@@ -158,16 +164,9 @@ module Debugger (
 				: nextTerminalAddress >= 246 && nextTerminalAddress < 254 ? hexCharacterOutput
 				: nextTerminalAddress >= 291 && nextTerminalAddress < 299 ? hexCharacterOutput
 				: nextTerminalAddress >= 410 && nextTerminalAddress < 442 ? disassemblerOutput[255 - 8 * (nextTerminalAddress - 410) -: 8]
-				: nextTerminalAddress >= 562 && nextTerminalAddress < 570 ? hexCharacterOutput
-				: nextTerminalAddress >= 579 && nextTerminalAddress < 587 ? hexCharacterOutput
-				: nextTerminalAddress >= 596 && nextTerminalAddress < 604 ? hexCharacterOutput
-				: nextTerminalAddress >= 613 && nextTerminalAddress < 621 ? hexCharacterOutput
-				: nextTerminalAddress >= 630 && nextTerminalAddress < 638 ? hexCharacterOutput
-				: nextTerminalAddress >= 642 && nextTerminalAddress < 650 ? hexCharacterOutput
-				: nextTerminalAddress >= 659 && nextTerminalAddress < 667 ? hexCharacterOutput
-				: nextTerminalAddress >= 676 && nextTerminalAddress < 684 ? hexCharacterOutput
-				: nextTerminalAddress >= 693 && nextTerminalAddress < 701 ? hexCharacterOutput
-				: nextTerminalAddress >= 710 && nextTerminalAddress < 718 ? hexCharacterOutput
+				: nextTerminalAddress >= 487 && nextTerminalAddress < 492 ? booleanTextOutput[39 - 8 * (nextTerminalAddress - 487) -: 8]
+				: nextTerminalAddress >= 572 && nextTerminalAddress < 577 ? booleanTextOutput[39 - 8 * (nextTerminalAddress - 572) -: 8]
+				: nextTerminalAddress >= 612 && nextTerminalAddress < 617 ? booleanTextOutput[39 - 8 * (nextTerminalAddress - 612) -: 8]
 				: nextTerminalAddress >= 722 && nextTerminalAddress < 730 ? hexCharacterOutput
 				: nextTerminalAddress >= 739 && nextTerminalAddress < 747 ? hexCharacterOutput
 				: nextTerminalAddress >= 756 && nextTerminalAddress < 764 ? hexCharacterOutput
@@ -190,19 +189,29 @@ module Debugger (
 				: nextTerminalAddress >= 1030 && nextTerminalAddress < 1038 ? hexCharacterOutput
 				: nextTerminalAddress >= 1042 && nextTerminalAddress < 1050 ? hexCharacterOutput
 				: nextTerminalAddress >= 1059 && nextTerminalAddress < 1067 ? hexCharacterOutput
-				: nextTerminalAddress >= 1210 && nextTerminalAddress < 1242 ? disassemblerOutput[255 - 8 * (nextTerminalAddress - 1210) -: 8]
-				: nextTerminalAddress >= 1295 && nextTerminalAddress < 1303 ? hexCharacterOutput
-				: nextTerminalAddress >= 1335 && nextTerminalAddress < 1343 ? hexCharacterOutput
-				: nextTerminalAddress >= 1374 && nextTerminalAddress < 1382 ? hexCharacterOutput
-				: nextTerminalAddress >= 1531 && nextTerminalAddress < 1563 ? disassemblerOutput[255 - 8 * (nextTerminalAddress - 1531) -: 8]
-				: nextTerminalAddress >= 1618 && nextTerminalAddress < 1626 ? hexCharacterOutput
-				: nextTerminalAddress >= 1660 && nextTerminalAddress < 1668 ? hexCharacterOutput
-				: nextTerminalAddress >= 1702 && nextTerminalAddress < 1707 ? booleanTextOutput[39 - 8 * (nextTerminalAddress - 1702) -: 8]
-				: nextTerminalAddress >= 1741 && nextTerminalAddress < 1749 ? hexCharacterOutput
-				: nextTerminalAddress >= 1850 && nextTerminalAddress < 1882 ? disassemblerOutput[255 - 8 * (nextTerminalAddress - 1850) -: 8]
-				: nextTerminalAddress >= 1944 && nextTerminalAddress < 1949 ? booleanTextOutput[39 - 8 * (nextTerminalAddress - 1944) -: 8]
-				: nextTerminalAddress >= 1986 && nextTerminalAddress < 1988 ? hexCharacterOutput
-				: nextTerminalAddress >= 2023 && nextTerminalAddress < 2031 ? hexCharacterOutput
+				: nextTerminalAddress >= 1076 && nextTerminalAddress < 1084 ? hexCharacterOutput
+				: nextTerminalAddress >= 1093 && nextTerminalAddress < 1101 ? hexCharacterOutput
+				: nextTerminalAddress >= 1110 && nextTerminalAddress < 1118 ? hexCharacterOutput
+				: nextTerminalAddress >= 1122 && nextTerminalAddress < 1130 ? hexCharacterOutput
+				: nextTerminalAddress >= 1139 && nextTerminalAddress < 1147 ? hexCharacterOutput
+				: nextTerminalAddress >= 1156 && nextTerminalAddress < 1164 ? hexCharacterOutput
+				: nextTerminalAddress >= 1173 && nextTerminalAddress < 1181 ? hexCharacterOutput
+				: nextTerminalAddress >= 1190 && nextTerminalAddress < 1198 ? hexCharacterOutput
+				: nextTerminalAddress >= 1202 && nextTerminalAddress < 1210 ? hexCharacterOutput
+				: nextTerminalAddress >= 1219 && nextTerminalAddress < 1227 ? hexCharacterOutput
+				: nextTerminalAddress >= 1370 && nextTerminalAddress < 1402 ? disassemblerOutput[255 - 8 * (nextTerminalAddress - 1370) -: 8]
+				: nextTerminalAddress >= 1455 && nextTerminalAddress < 1463 ? hexCharacterOutput
+				: nextTerminalAddress >= 1495 && nextTerminalAddress < 1503 ? hexCharacterOutput
+				: nextTerminalAddress >= 1534 && nextTerminalAddress < 1542 ? hexCharacterOutput
+				: nextTerminalAddress >= 1691 && nextTerminalAddress < 1723 ? disassemblerOutput[255 - 8 * (nextTerminalAddress - 1691) -: 8]
+				: nextTerminalAddress >= 1778 && nextTerminalAddress < 1786 ? hexCharacterOutput
+				: nextTerminalAddress >= 1820 && nextTerminalAddress < 1828 ? hexCharacterOutput
+				: nextTerminalAddress >= 1862 && nextTerminalAddress < 1867 ? booleanTextOutput[39 - 8 * (nextTerminalAddress - 1862) -: 8]
+				: nextTerminalAddress >= 1901 && nextTerminalAddress < 1909 ? hexCharacterOutput
+				: nextTerminalAddress >= 2010 && nextTerminalAddress < 2042 ? disassemblerOutput[255 - 8 * (nextTerminalAddress - 2010) -: 8]
+				: nextTerminalAddress >= 2104 && nextTerminalAddress < 2109 ? booleanTextOutput[39 - 8 * (nextTerminalAddress - 2104) -: 8]
+				: nextTerminalAddress >= 2146 && nextTerminalAddress < 2148 ? hexCharacterOutput
+				: nextTerminalAddress >= 2183 && nextTerminalAddress < 2191 ? hexCharacterOutput
 				: backgroundCharacter;
 	end
 endmodule

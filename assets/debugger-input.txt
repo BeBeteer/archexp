@@ -2,6 +2,9 @@ cpu_if_instruction
 cpu_if_pc
 cpu_if_nextPc
 cpu_id_instruction
+cpu_id_shouldStall
+cpu_id_shouldForwardRegisterRs
+cpu_id_shouldForwardRegisterRt
 cpu_id_register0
 cpu_id_register1
 cpu_id_register2

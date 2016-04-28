@@ -9,6 +9,9 @@ module Cpu (
 		output [31:0] debug_if_nextPc,
 		output [31:0] debug_if_instruction,
 		output [31:0] debug_id_instruction,
+		output debug_id_shouldStall,
+		output debug_id_shouldForwardRegisterRs,
+		output debug_id_shouldForwardRegisterRt,
 		output [32 * 32 - 1 : 0] debug_id_registers,
 		output [31:0] debug_ex_instruction,
 		output [31:0] debug_ex_aluInputA,
@@ -167,6 +170,8 @@ module Cpu (
 		.mem_memoryData(mem_memoryData[31:0]),
 		.shouldStall(id_shouldStall),
 
+		.debug_shouldForwardRegisterRs(debug_id_shouldForwardRegisterRs),
+		.debug_shouldForwardRegisterRt(debug_id_shouldForwardRegisterRt),
 		.debug_registers(debug_id_registers[32 * 32 - 1 : 0])
 	);
 
@@ -302,6 +307,7 @@ module Cpu (
 	assign debug_if_nextPc = if_nextPc[31:0];
 	assign debug_if_instruction = if_instruction[31:0];
 	assign debug_id_instruction = id_instruction[31:0];
+	assign debug_id_shouldStall = id_shouldStall;
 	assign debug_ex_instruction = ex_instruction[31:0];
 	assign debug_ex_aluOutput = ex_aluOutput[31:0];
 	assign debug_mem_instruction = mem_instruction[31:0];

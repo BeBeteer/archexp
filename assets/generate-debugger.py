@@ -34,7 +34,12 @@ def getTerminalAddress(interpolation):
 designLineList = []
 with open('debugger-design.txt') as designFile:
     for line in designFile:
+        if len(line.rstrip()) > 80:
+            raise AssertionError('Design contains a line more than 80 characters')
         designLineList.append(line.rstrip().ljust(80))
+if len(designLineList) != 30:
+    raise AssertionError('Design does not contain exactly 30 lines')
+
 inputList = []
 with open('debugger-input.txt') as inputFile:
     for line in inputFile:
@@ -82,6 +87,12 @@ for interpolation in interpolationList:
         source = 'booleanTextOutput'
         dataList.append('nextTerminalAddress >= {} && nextTerminalAddress < {} ? {}[{} - 8 * (nextTerminalAddress - {}) -: 8]'.format(address, address + length, source, length * 8 - 1, address))
 
+try:
+    next(inputIter)
+    raise AssertionError('Input is not fully consumed')
+except StopIteration:
+    pass
+
 def printLineList(firstLine, lineList, lastLine = None):
     print(firstLine)
     isFirst = True
@@ -97,7 +108,7 @@ def printLineList(firstLine, lineList, lastLine = None):
 
 printLineList('wire [31:0] disassemblerInput =', disassemblerInputList, '32\'hFFFFFFFF')
 print()
-printLineList('wire [3:0] hexCharacterInput =', hexCharacterInputList, '4\'hFF')
+printLineList('wire [3:0] hexCharacterInput =', hexCharacterInputList, '4\'hF')
 print()
 printLineList('wire booleanTextInput =', booleanTextInputList, '1\'b1')
 print()
@@ -115,3 +126,6 @@ memory_initialization_vector=''', file=backgroundFile)
                 print(', ', end='', file=backgroundFile)
             print("{:02x}".format(ord(character)), end='', file=backgroundFile)
     print(';', file=backgroundFile)
+
+print()
+print('NOTICE: Please copy Background.coe to ipcore_dir/ and regenerate core.')

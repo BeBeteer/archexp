@@ -4,6 +4,8 @@ IF Stage: nop
 PC: 0xFFFFFFFF                          Next PC: 0xFFFFFFFF
 ================================================================================
 ID Stage: nop
+Stall: True
+Forward Rs: True                        Forward Rt: True
 Registers:
 0xFFFFFFFF       0xFFFFFFFF       0xFFFFFFFF       0xFFFFFFFF       0xFFFFFFFF
 0xFFFFFFFF       0xFFFFFFFF       0xFFFFFFFF       0xFFFFFFFF       0xFFFFFFFF
@@ -24,7 +26,5 @@ Memory Write Enabled: True              Memory Write Data: 0xFFFFFFFF
 WB Stage: nop
 Register Write Enabled: True            Register Write Address: 0xAA
 Register Write Data: 0xFFFFFFFF
-
-
 
 
