@@ -5,6 +5,8 @@ module Pc (
 		input clock,
 		input reset,
 
+		input id_shouldStall,
+
 		input [31:0] nextPc,
 		output reg [31:0] pc = 0
 	);
@@ -12,6 +14,8 @@ module Pc (
 	always @(posedge clock) begin
 		if (reset) begin
 			pc <= 0;
+		end else if (id_shouldStall) begin
+			pc <= pc;
 		end else begin
 			pc <= nextPc;
 		end

@@ -49,6 +49,7 @@ module Cpu (
 	wire id_shouldWriteMemory;
 	wire id_shouldStall;
 
+	wire [31:0] ex_instruction;
 	wire [31:0] ex_shiftAmount;
 	wire [31:0] ex_immediate;
 	wire [31:0] ex_registerRsOrPc_4;
@@ -63,6 +64,7 @@ module Cpu (
 
 	wire [31:0] ex_aluOutput;
 
+	wire [31:0] mem_instruction;
 	wire mem_shouldWriteRegister;
 	wire [4:0] mem_registerWriteAddress;
 	wire mem_shouldWriteMemoryElseAluOutputToRegister;
@@ -72,6 +74,7 @@ module Cpu (
 
 	wire [31:0] mem_memoryData;
 
+	wire [31:0] wb_instruction;
 	wire wb_shouldWriteRegister;
 	wire [4:0] wb_registerWriteAddress;
 	wire wb_shouldWriteMemoryElseAluOutputToRegister;
@@ -84,6 +87,8 @@ module Cpu (
 
 		.clock(clock),
 		.reset(reset),
+
+		.id_shouldStall(id_shouldStall),
 
 		.nextPc(if_nextPc[31:0]),
 		.pc(if_pc[31:0])
@@ -161,6 +166,10 @@ module Cpu (
 		.clock(clock),
 		.reset(reset),
 
+		.id_shouldStall(id_shouldStall),
+
+		.id_instruction(id_instruction[31:0]),
+
 		.id_shiftAmount(id_shiftAmount[31:0]),
 		.id_immediate(id_immediate[31:0]),
 
@@ -176,6 +185,8 @@ module Cpu (
 		.id_shouldWriteMemoryElseAluOutputToRegister(id_shouldWriteMemoryElseAluOutputToRegister),
 
 		.id_shouldWriteMemory(id_shouldWriteMemory),
+
+		.ex_instruction(ex_instruction[31:0]),
 
 		.ex_shiftAmount(ex_shiftAmount[31:0]),
 		.ex_immediate(ex_immediate[31:0]),
@@ -217,6 +228,8 @@ module Cpu (
 		.clock(clock),
 		.reset(reset),
 
+		.ex_instruction(ex_instruction[31:0]),
+
 		.ex_shouldWriteRegister(ex_shouldWriteRegister),
 		.ex_registerWriteAddress(ex_registerWriteAddress[4:0]),
 		.ex_shouldWriteMemoryElseAluOutputToRegister(ex_shouldWriteMemoryElseAluOutputToRegister),
@@ -224,6 +237,8 @@ module Cpu (
 		.ex_aluOutput(ex_aluOutput[31:0]),
 		.ex_shouldWriteMemory(ex_shouldWriteMemory),
 		.ex_registerRtOrZero(ex_registerRtOrZero[31:0]),
+
+		.mem_instruction(mem_instruction[31:0]),
 
 		.mem_shouldWriteRegister(mem_shouldWriteRegister),
 		.mem_registerWriteAddress(mem_registerWriteAddress[4:0]),
@@ -250,11 +265,15 @@ module Cpu (
 		.clock(clock),
 		.reset(reset),
 
+		.mem_instruction(mem_instruction[31:0]),
+
 		.mem_shouldWriteRegister(mem_shouldWriteRegister),
 		.mem_registerWriteAddress(mem_registerWriteAddress[4:0]),
 		.mem_shouldWriteMemoryElseAluOutputToRegister(mem_shouldWriteMemoryElseAluOutputToRegister),
 		.mem_memoryData(mem_memoryData[31:0]),
 		.mem_aluOutput(mem_aluOutput[31:0]),
+
+		.wb_instruction(wb_instruction[31:0]),
 
 		.wb_shouldWriteRegister(wb_shouldWriteRegister),
 		.wb_registerWriteAddress(wb_registerWriteAddress[4:0]),
@@ -270,27 +289,18 @@ module Cpu (
 		.registerWriteData(wb_registerWriteData[31:0])
 	);
 
-	DebugRegisters debugRegisters (
-
-		.clock(clock),
-		.reset(reset),
-
-		.id_instruction(debug_id_instruction[31:0]),
-
-		.ex_instruction(debug_ex_instruction[31:0]),
-		.mem_instruction(debug_mem_instruction[31:0]),
-		.wb_instruction(debug_wb_instruction[31:0])
-	);
-
 	assign debug_if_pc = if_pc[31:0];
 	assign debug_if_nextPc = if_nextPc[31:0];
 	assign debug_if_instruction = if_instruction[31:0];
 	assign debug_id_instruction = id_instruction[31:0];
+	assign debug_ex_instruction = ex_instruction[31:0];
 	assign debug_ex_aluOutput = ex_aluOutput[31:0];
+	assign debug_mem_instruction = mem_instruction[31:0];
 	assign debug_mem_memoryAddress = mem_aluOutput[31:0];
 	assign debug_mem_memoryReadData = mem_memoryData[31:0];
 	assign debug_mem_shouldWriteMemory = mem_shouldWriteMemory;
 	assign debug_mem_memoryWriteData = mem_registerRtOrZero[31:0];
+	assign debug_wb_instruction = wb_instruction[31:0];
 	assign debug_wb_shouldWriteRegister = wb_shouldWriteRegister;
 	assign debug_wb_registerWriteAddress = wb_registerWriteAddress[4:0];
 	assign debug_wb_registerWriteData = wb_registerWriteData[31:0];

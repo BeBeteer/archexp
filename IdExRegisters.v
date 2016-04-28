@@ -5,6 +5,10 @@ module IdExRegisters (
 		input clock,
 		input reset,
 
+		input id_shouldStall,
+
+		input [31:0] id_instruction,
+
 		input [31:0] id_shiftAmount,
 		input [31:0] id_immediate,
 
@@ -20,6 +24,8 @@ module IdExRegisters (
 		input id_shouldWriteMemoryElseAluOutputToRegister,
 
 		input id_shouldWriteMemory,
+
+		output reg [31:0] ex_instruction = 0,
 
 		output reg [31:0] ex_shiftAmount = 0,
 		output reg [31:0] ex_immediate = 0,
@@ -40,7 +46,9 @@ module IdExRegisters (
 
 	always @(posedge clock) begin
 
-		if (reset) begin
+		if (reset || id_shouldStall) begin
+
+			ex_instruction <= 0;
 
 			ex_shiftAmount <= 0;
 			ex_immediate <= 0;
@@ -59,6 +67,8 @@ module IdExRegisters (
 			ex_shouldWriteMemory <= 0;
 
 		end else begin
+
+			ex_instruction <= id_instruction;
 
 			ex_shiftAmount <= id_shiftAmount;
 			ex_immediate <= id_immediate;

@@ -5,6 +5,8 @@ module ExMemRegisters (
 		input clock,
 		input reset,
 
+		input [31:0] ex_instruction,
+
 		input ex_shouldWriteRegister,
 		input [4:0] ex_registerWriteAddress,
 		input ex_shouldWriteMemoryElseAluOutputToRegister,
@@ -12,6 +14,8 @@ module ExMemRegisters (
 		input [31:0] ex_aluOutput,
 		input ex_shouldWriteMemory,
 		input [31:0] ex_registerRtOrZero,
+
+		output reg [31:0] mem_instruction = 0,
 
 		output reg mem_shouldWriteRegister = 0,
 		output reg [4:0] mem_registerWriteAddress = 0,
@@ -26,6 +30,8 @@ module ExMemRegisters (
 
 		if (reset) begin
 
+			mem_instruction <= 0;
+
 			mem_shouldWriteRegister <= 0;
 			mem_registerWriteAddress <= 0;
 			mem_shouldWriteMemoryElseAluOutputToRegister <= 0;
@@ -35,6 +41,8 @@ module ExMemRegisters (
 			mem_registerRtOrZero <= 0;
 
 		end else begin
+
+			mem_instruction <= ex_instruction;
 
 			mem_shouldWriteRegister <= ex_shouldWriteRegister;
 			mem_registerWriteAddress <= ex_registerWriteAddress;
