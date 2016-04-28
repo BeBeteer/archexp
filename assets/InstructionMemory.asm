@@ -1,11 +1,15 @@
-lw $1, 80($0)
-lw $6, 84($0)
 label_0:
-add $3, $0, $0
-add $4, $0, $0
-add $5, $0, $0
-add $2, $2, $1
-sub $3, $3, $1
-and $4, $4, $1
-nor $5, $5, $1
-beq $2, $1, label_0
+lw $1, 84($0)
+add $2, $1, $1
+label_2:
+sub $3, $1, $2
+beq $1, $1, label_2
+andi $4, $2, 0
+addi $5, $4, 1
+ori $6, $3, 0
+bne $6, $3, label_2
+lw $7, 80($0)
+sw $7, 84($0)
+addi $8, $7, 1
+j label_0
+andi $9, $8, 1
