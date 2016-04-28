@@ -156,6 +156,15 @@ module Cpu (
 		.wb_registerWriteAddress(wb_registerWriteAddress[4:0]),
 		.wb_registerWriteData(wb_registerWriteData[31:0]),
 
+		.ex_shouldWriteRegister(ex_shouldWriteRegister),
+		.ex_registerWriteAddress(ex_registerWriteAddress[4:0]),
+		.ex_shouldWriteMemoryElseAluOutputToRegister(ex_shouldWriteMemoryElseAluOutputToRegister),
+		.ex_aluOutput(ex_aluOutput[31:0]),
+		.mem_shouldWriteRegister(mem_shouldWriteRegister),
+		.mem_registerWriteAddress(mem_registerWriteAddress[4:0]),
+		.mem_shouldWriteMemoryElseAluOutputToRegister(mem_shouldWriteMemoryElseAluOutputToRegister),
+		.mem_aluOutput(mem_aluOutput[31:0]),
+		.mem_memoryData(mem_memoryData[31:0]),
 		.shouldStall(id_shouldStall),
 
 		.debug_registers(debug_id_registers[32 * 32 - 1 : 0])

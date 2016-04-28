@@ -25,9 +25,19 @@ module ControlUnit (
 
 		output shouldWriteMemory,	// WMEM
 
+		input ex_shouldWriteRegister,
+		input [4:0] ex_registerWriteAddress,
+		input ex_shouldWriteMemoryElseAluOutputToRegister,
+		input mem_shouldWriteRegister,
+		input [4:0] mem_registerWriteAddress,
+		input mem_shouldWriteMemoryElseAluOutputToRegister,
 		output shouldStall,	// WPCIR
-		output [1:0] registerRsForwardControl,	// FWDA
-		output [1:0] registerRtForwardControl	// FWDB
+		output shouldForwardRegisterRsWithExStageAluOutput,
+		output shouldForwardRegisterRsWithMemStageAluOutput,
+		output shouldForwardRegisterRsWithMemStageMemoryData,
+		output shouldForwardRegisterRtWithExStageAluOutput,
+		output shouldForwardRegisterRtWithMemStageAluOutput,
+		output shouldForwardRegisterRtWithMemStageMemoryData
 	);
 
 	wire [5:0] code = instruction[31:26];
@@ -143,5 +153,17 @@ module ControlUnit (
 
 	assign shouldWriteMemory = code == `CODE_SW;
 
-	// TODO: Forward and stall.
+	wire [4:0] rs = instruction[25:21];
+	wire [4:0] rt = instruction[20:16];
+	wire willExStageWriteRegisterRs = ex_shouldWriteRegister && ex_registerWriteAddress == rs;
+	wire willExStageWriteRegisterRt = ex_shouldWriteRegister && ex_registerWriteAddress == rt;
+	wire willMemStageWriteRegisterRs = mem_shouldWriteRegister && mem_registerWriteAddress == rs;
+	wire willMemStageWriteRegisterRt = mem_shouldWriteRegister && mem_registerWriteAddress == rt;
+	assign shouldStall = (willExStageWriteRegisterRs || willExStageWriteRegisterRt) && ex_shouldWriteMemoryElseAluOutputToRegister;
+	assign shouldForwardRegisterRsWithExStageAluOutput = willExStageWriteRegisterRs && !ex_shouldWriteMemoryElseAluOutputToRegister;
+	assign shouldForwardRegisterRsWithMemStageAluOutput = willMemStageWriteRegisterRs && !mem_shouldWriteMemoryElseAluOutputToRegister;
+	assign shouldForwardRegisterRsWithMemStageMemoryData = willMemStageWriteRegisterRs && mem_shouldWriteMemoryElseAluOutputToRegister;
+	assign shouldForwardRegisterRtWithExStageAluOutput = willExStageWriteRegisterRt && !ex_shouldWriteMemoryElseAluOutputToRegister;
+	assign shouldForwardRegisterRtWithMemStageAluOutput = willMemStageWriteRegisterRt && !mem_shouldWriteMemoryElseAluOutputToRegister;
+	assign shouldForwardRegisterRtWithMemStageMemoryData = willMemStageWriteRegisterRt && mem_shouldWriteMemoryElseAluOutputToRegister;
 endmodule

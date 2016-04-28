@@ -32,6 +32,15 @@ module IdStage (
 		input [4:0] wb_registerWriteAddress,
 		input [31:0] wb_registerWriteData,
 
+		input ex_shouldWriteRegister,
+		input [4:0] ex_registerWriteAddress,
+		input ex_shouldWriteMemoryElseAluOutputToRegister,
+		input [31:0] ex_aluOutput,
+		input mem_shouldWriteRegister,
+		input [4:0] mem_registerWriteAddress,
+		input mem_shouldWriteMemoryElseAluOutputToRegister,
+		input [31:0] mem_aluOutput,
+		input [31:0] mem_memoryData,
 		output shouldStall,	// WPCIR
 
 		output [32 * 32 - 1 : 0] debug_registers
@@ -44,8 +53,12 @@ module IdStage (
 	wire isJumpAndLink;	// JAL
 	wire shouldSignElseZeroExtendImmediate;	// SEXT
 	wire shouldWriteToRegisterRtElseRd;	// REGRT
-	wire [1:0] registerRsForwardControl;	// FWDA
-	wire [1:0] registerRtForwardControl;	// FWDB
+	wire shouldForwardRegisterRsWithExStageAluOutput;
+	wire shouldForwardRegisterRsWithMemStageAluOutput;
+	wire shouldForwardRegisterRsWithMemStageMemoryData;
+	wire shouldForwardRegisterRtWithExStageAluOutput;
+	wire shouldForwardRegisterRtWithMemStageAluOutput;
+	wire shouldForwardRegisterRtWithMemStageMemoryData;
 	ControlUnit controlUnit (
 
 		.instruction(instruction[31:0]),
@@ -69,9 +82,19 @@ module IdStage (
 
 		.shouldWriteMemory(shouldWriteMemory),
 
+		.ex_shouldWriteRegister(ex_shouldWriteRegister),
+		.ex_registerWriteAddress(ex_registerWriteAddress[4:0]),
+		.ex_shouldWriteMemoryElseAluOutputToRegister(ex_shouldWriteMemoryElseAluOutputToRegister),
+		.mem_shouldWriteRegister(mem_shouldWriteRegister),
+		.mem_registerWriteAddress(mem_registerWriteAddress[4:0]),
+		.mem_shouldWriteMemoryElseAluOutputToRegister(mem_shouldWriteMemoryElseAluOutputToRegister),
 		.shouldStall(shouldStall),
-		.registerRsForwardControl(registerRsForwardControl[1:0]),
-		.registerRtForwardControl(registerRtForwardControl[1:0])
+		.shouldForwardRegisterRsWithExStageAluOutput(shouldForwardRegisterRsWithExStageAluOutput),
+		.shouldForwardRegisterRsWithMemStageAluOutput(shouldForwardRegisterRsWithMemStageAluOutput),
+		.shouldForwardRegisterRsWithMemStageMemoryData(shouldForwardRegisterRsWithMemStageMemoryData),
+		.shouldForwardRegisterRtWithExStageAluOutput(shouldForwardRegisterRtWithExStageAluOutput),
+		.shouldForwardRegisterRtWithMemStageAluOutput(shouldForwardRegisterRtWithMemStageAluOutput),
+		.shouldForwardRegisterRtWithMemStageMemoryData(shouldForwardRegisterRtWithMemStageMemoryData)
 	);
 
 	assign shiftAmount = {27'b0, instruction[10:6]};
@@ -108,9 +131,16 @@ module IdStage (
 		.debug_registers(debug_registers[32 * 32 - 1 : 0])
 	);
 
-	// TODO: Forwarding
-	wire [31:0] registerRs = localRegisterRs;
-	wire [31:0] registerRt = localRegisterRt;
+	wire [31:0] registerRs =
+			shouldForwardRegisterRsWithExStageAluOutput ? ex_aluOutput
+			: shouldForwardRegisterRsWithMemStageAluOutput ? mem_aluOutput
+			: shouldForwardRegisterRsWithMemStageMemoryData ? mem_memoryData
+			: localRegisterRs;
+	wire [31:0] registerRt =
+			shouldForwardRegisterRtWithExStageAluOutput ? ex_aluOutput
+			: shouldForwardRegisterRtWithMemStageAluOutput ? mem_aluOutput
+			: shouldForwardRegisterRtWithMemStageMemoryData ? mem_memoryData
+			: localRegisterRt;
 
 	assign registerRsOrPc_4 = isJumpAndLink ? pc_4 : registerRs;
 	assign registerRtOrZero = isJumpAndLink ? 32'b0 : registerRt;
