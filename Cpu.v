@@ -118,6 +118,8 @@ module Cpu (
 		.clock(clock),
 		.reset(reset),
 
+		.id_shouldStall(id_shouldStall),
+
 		.if_pc_4(if_pc_4[31:0]),
 
 		.if_instruction(if_instruction[31:0]),
