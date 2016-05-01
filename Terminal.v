@@ -19,7 +19,8 @@ module Terminal (
 	localparam COLOR_BLACK = 8'b000_000_00;
 
 	// 640x480, 80x30
-	reg [15:0] text [0:2399];
+//	reg [15:0] text [0:2399];
+	reg [15:0] text [0:4095];
 
 	wire [11:0] textIndex = vgaX / 8 + (vgaY / 16) * 80;
 	wire [15:0] textData = text[textIndex];
