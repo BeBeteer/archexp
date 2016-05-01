@@ -83,7 +83,8 @@ module ControlUnit (
 				: function_ == `FUNCTION_SRLV ? `ALU_SRL
 				: function_ == `FUNCTION_SRAV ? `ALU_SRA
 				: `ALU_NONE
-			) : code == `CODE_ADDI ? `ALU_ADD
+			)
+			: code == `CODE_ADDI ? `ALU_ADD
 			: code == `CODE_ADDIU ? `ALU_ADDU
 			: code == `CODE_ANDI ? `ALU_AND
 			: code == `CODE_ORI ? `ALU_OR
