@@ -2,7 +2,7 @@
 
 张海
 
-本项目是我按照课程要求独立完成的流水线 CPU 实现。
+本项目是我按照课程要求独立完成的 MIPS 流水线 CPU 实现。目前已实现 31 条指令和 Stall/Forwarding。
 
 ## 原因
 
@@ -53,7 +53,7 @@
 ## 许可证
 
 ```
-Copyright (c) 2016 Zhang Hai <Dreaming.in.Code.ZH@Gmail.com>
+Copyright (c) 2016 Zhang Hai <dreaming.in.code.zh@gmail.com>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
