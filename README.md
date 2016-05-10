@@ -4,6 +4,10 @@
 
 本项目是我按照课程要求独立完成的 MIPS 流水线 CPU 实现。目前已实现 31 条指令和 Stall/Forwarding。
 
+本项目的开发使用 Nexys 3 开发版进行，但应当可以很简单地移植到其他开发板。
+
+本项目的二进制 .bit 文件可以在 [Releases](https://github.com/DreaminginCodeZH/archexp/releases/) 中下载。
+
 ## 原因
 
 课程提供的代码在结构、命名和排版上都有诸多不清晰和不一致之处，使得编码和调试时很不舒服。
