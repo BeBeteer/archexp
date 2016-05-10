@@ -54,7 +54,7 @@
 
     本项目中大部分代码逻辑都在 `*Stage.v` 中，而 `*Registers.v` 和 `Cpu.v` 均为生成的代码。
 
-## 许可证
+## 许可
 
 ```
 Copyright (c) 2016 Zhang Hai <dreaming.in.code.zh@gmail.com>
